@@ -11,4 +11,4 @@ document.title = data.title || data.description;
 document.querySelector('#info-picture').setAttribute('src', data.picture);
 document.querySelector('#info-title').innerHTML = data.title;
 document.querySelector('#info-description').innerHTML = data.description;
-document.querySelector('#disqus-comments').setAttribute('src', "https://siloor.com/public/meerkat/?id=" + encodeURIComponent(data.disqusIdentifier));
+document.querySelector('#disqus-comments').setAttribute('src', "https://siloor.github.io/meerkat-for-a-transparent-market/disqus.html?id=" + encodeURIComponent(data.disqusIdentifier));
