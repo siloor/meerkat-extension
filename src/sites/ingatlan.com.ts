@@ -1,4 +1,4 @@
-import { BASE_PROPERTIES, SERVICES } from '../constants';
+import { BASE_PROPERTIES, SERVICES, PROPERTY_TYPES } from '../constants';
 import { textContentWithSeparator, removeUnnecessaryWhitespace } from '../utils';
 import { getToolbar } from '../dic';
 
@@ -12,10 +12,10 @@ const PROPERTIES = {
 };
 
 const propertiesToCheck = [
-  { name: PROPERTIES.PRICE, title: 'Ár' },
-  { name: PROPERTIES.URL, title: 'Url' },
-  { name: PROPERTIES.PICTURE, title: 'Kép' },
-  { name: PROPERTIES.DESCRIPTION, title: 'Leírás' }
+  { name: PROPERTIES.PRICE, title: 'Ár', type: PROPERTY_TYPES.NUMBER },
+  { name: PROPERTIES.URL, title: 'Url', type: PROPERTY_TYPES.URL },
+  { name: PROPERTIES.PICTURE, title: 'Kép', type: PROPERTY_TYPES.IMAGE },
+  { name: PROPERTIES.DESCRIPTION, title: 'Leírás', type: PROPERTY_TYPES.TEXT }
 ];
 
 const getId = (path) => {

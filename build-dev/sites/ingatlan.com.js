@@ -10,6 +10,12 @@ var SERVICES = {
     CLEAR_NAMESPACE: 'clear_namespace',
     OPEN_COMMENTS: 'open_comments'
 };
+var PROPERTY_TYPES = {
+    NUMBER: 'number',
+    TEXT: 'text',
+    URL: 'url',
+    IMAGE: 'image'
+};
 
 var textContentWithSeparator = function (rootNode) {
     var childNodes = rootNode.childNodes;
@@ -47,10 +53,10 @@ var PROPERTIES = {
     DESCRIPTION: 'description'
 };
 var propertiesToCheck = [
-    { name: PROPERTIES.PRICE, title: 'Ár' },
-    { name: PROPERTIES.URL, title: 'Url' },
-    { name: PROPERTIES.PICTURE, title: 'Kép' },
-    { name: PROPERTIES.DESCRIPTION, title: 'Leírás' }
+    { name: PROPERTIES.PRICE, title: 'Ár', type: PROPERTY_TYPES.NUMBER },
+    { name: PROPERTIES.URL, title: 'Url', type: PROPERTY_TYPES.URL },
+    { name: PROPERTIES.PICTURE, title: 'Kép', type: PROPERTY_TYPES.IMAGE },
+    { name: PROPERTIES.DESCRIPTION, title: 'Leírás', type: PROPERTY_TYPES.TEXT }
 ];
 var getId = function (path) {
     var parts = path.split('/');

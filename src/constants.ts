@@ -11,3 +11,10 @@ export const SERVICES = {
   CLEAR_NAMESPACE: 'clear_namespace',
   OPEN_COMMENTS: 'open_comments'
 };
+
+export const PROPERTY_TYPES = {
+  NUMBER: 'number',
+  TEXT: 'text',
+  URL: 'url',
+  IMAGE: 'image'
+};
