@@ -39,7 +39,6 @@ var getToolbar = function () {
     return getContainer().toolbar;
 };
 
-var _a;
 var NAMESPACE = 'ingatlan.com';
 var PROPERTIES = {
     PRICE: 'price',
@@ -48,17 +47,11 @@ var PROPERTIES = {
     DESCRIPTION: 'description'
 };
 var propertiesToCheck = [
-    PROPERTIES.PRICE,
-    PROPERTIES.URL,
-    PROPERTIES.PICTURE,
-    PROPERTIES.DESCRIPTION
+    { name: PROPERTIES.PRICE, title: 'Ár' },
+    { name: PROPERTIES.URL, title: 'Url' },
+    { name: PROPERTIES.PICTURE, title: 'Kép' },
+    { name: PROPERTIES.DESCRIPTION, title: 'Leírás' }
 ];
-var propertiesToCheckTranslations = (_a = {},
-    _a[PROPERTIES.PRICE] = 'Ár',
-    _a[PROPERTIES.URL] = 'Url',
-    _a[PROPERTIES.PICTURE] = 'Kép',
-    _a[PROPERTIES.DESCRIPTION] = 'Leírás',
-    _a);
 var getId = function (path) {
     var parts = path.split('/');
     if (parts.length < 5) {
@@ -112,7 +105,7 @@ var start = function () {
             message: SERVICES.GET_LIST,
             items: items_1.map(function (item) { return getItemData(item); }),
             namespace: NAMESPACE,
-            propertiesToCheck: propertiesToCheck,
+            propertiesToCheck: propertiesToCheck.map(function (property) { return property.name; }),
             version: 1
         }, function (response) {
             for (var i = 0; i < items_1.length; i++) {
@@ -122,7 +115,7 @@ var start = function () {
                 div.style.position = 'relative';
                 div.style.zIndex = '150';
                 items_1[i].appendChild(div);
-                getToolbar().initToolbar(div, response.items[i], propertiesToCheck, propertiesToCheckTranslations, stringToPrice, openComments);
+                getToolbar().initToolbar(div, response.items[i], propertiesToCheck, stringToPrice, openComments);
             }
         });
     }

@@ -567,20 +567,20 @@ var renderElement = function (_a) {
     };
     return "\n<div>\n  <div style=\"" + styles.container + "\">\n    <span style=\"" + styles.logo + "\">M</span>\n    <span style=\"" + styles.date + "\" title=\"" + translations.firstSaw + ": " + timestampToString(creationDate) + "\">" + days + " " + translations.daysAgo + "</span>\n    <span style=\"" + styles.priceDifference + "\" title=\"" + translations.priceChange + "\">" + (priceDifference > 0 ? '+' : '') + numberToString(priceDifference) + (currency === null ? '' : " " + currency) + "</span>\n    <a style=\"" + styles.changesButton + "\" href=\"javascript:void(0);\">" + translations.changes + " (" + changes.length + ")</a>\n    <div style=\"" + styles.changes + "\">\n      <div style=\"" + styles.tableContainer + "\">\n        <div style=\"" + styles.tableContainerInner + "\">\n          <table style=\"" + styles.table + "\">\n            <thead>\n              <th style=\"" + styles.tableHeaderType + "\">" + translations.changesLabelType + "</th>\n              <th style=\"" + styles.tableHeaderDate + "\">" + translations.changesLabelDate + "</th>\n              <th style=\"" + styles.tableHeaderValue + "\">" + translations.changesLabelValue + "</th>\n            </thead>\n            <tbody>\n              " + changesHTML.map(function (html) { return html.trim(); }).join('') + "\n            </tbody>\n          </table>\n        </div>\n      </div>\n      <div>\n        <a href=\"javascript:void(0);\" style=\"" + styles.changesCloseButton + "\">X</a>\n      </div>\n    </div>\n    <a style=\"" + styles.commentsButton + "\" href=\"javascript:void(0);\">" + translations.comments + " (" + commentCount + ")</a>\n  </div>\n</div>\n";
 };
-var getElementParameters = function (history, commentCount, propertiesToCheck, propertiesToCheckTranslations, stringToPrice) {
+var getElementParameters = function (history, commentCount, propertiesToCheck, stringToPrice) {
     var oldPrice = stringToPrice(history[0].price);
     var newPrice = stringToPrice(history[history.length - 1].price);
     var changes = [];
     for (var i = 1; i < history.length; i++) {
         for (var _i = 0, propertiesToCheck_1 = propertiesToCheck; _i < propertiesToCheck_1.length; _i++) {
             var property = propertiesToCheck_1[_i];
-            var value = history[i][property];
-            var oldValue = history[i - 1][property];
+            var value = history[i][property.name];
+            var oldValue = history[i - 1][property.name];
             if (value === oldValue) {
                 continue;
             }
             changes.push({
-                type: propertiesToCheckTranslations[property],
+                type: property.title,
                 date: history[i][BASE_PROPERTIES.CREATED_TIMESTAMP],
                 value: value,
                 oldValue: oldValue
@@ -596,8 +596,8 @@ var getElementParameters = function (history, commentCount, propertiesToCheck, p
         changes: changes
     };
 };
-var initToolbar = function (root, item, propertiesToCheck, propertiesToCheckTranslations, stringToPrice, openComments) {
-    var parameters = getElementParameters(item.history, item.commentCount, propertiesToCheck, propertiesToCheckTranslations, stringToPrice);
+var initToolbar = function (root, item, propertiesToCheck, stringToPrice, openComments) {
+    var parameters = getElementParameters(item.history, item.commentCount, propertiesToCheck, stringToPrice);
     root.innerHTML = renderElement(parameters).trim();
     var element = root.firstElementChild;
     var openButton = element.getElementsByTagName('a')[0];
