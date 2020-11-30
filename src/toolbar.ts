@@ -1,5 +1,5 @@
 import { diffHTML } from './Diffr';
-import { BASE_PROPERTIES } from './constants';
+import { BASE_PROPERTIES, PROPERTY_TYPES } from './constants';
 import { setToolbar } from './dic';
 
 const timestampToString = (timestamp) => {
@@ -159,16 +159,6 @@ const renderElement = ({
     }
   });
 
-  for (const change of changes) {
-    changesHTML.push(`
-      <tr>
-        <td style="${styles.tableCell}">${change.type}</td>
-        <td style="${styles.tableCell}">${timestampToString(change.date)}</td>
-        <td style="${styles.tableCell}">${getTextDiff(change.oldValue, change.value)}</td>
-      </tr>
-    `);
-  }
-
   const translations = {
     firstSaw: 'Első megtekintés',
     daysAgo: 'napja',
@@ -177,8 +167,34 @@ const renderElement = ({
     changesLabelType: 'Típus',
     changesLabelDate: 'Dátum',
     changesLabelValue: 'Érték',
-    comments: 'Hozzászólások'
+    comments: 'Hozzászólások',
+    oldUrl: 'Régi link',
+    newUrl: 'Új link',
+    oldImage: 'Régi kép',
+    newImage: 'Új kép'
   };
+
+  const renderDiff = (oldValue, value, type) => {
+    if (type === PROPERTY_TYPES.TEXT) {
+      return getTextDiff(oldValue, value);
+    } else if (type === PROPERTY_TYPES.URL) {
+      return `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldUrl}</a> - <a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newUrl}</a>`;
+    } else if (type === PROPERTY_TYPES.IMAGE) {
+      return `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldImage}</a> - <a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newImage}</a>`;
+    }
+
+    return `<span style="color: #ff4500; text-decoration: line-through;">${oldValue}</span> <span style="color: #39b54a;">${value}</span>`;
+  };
+
+  for (const change of changes) {
+    changesHTML.push(`
+      <tr>
+        <td style="${styles.tableCell}">${change.property.title}</td>
+        <td style="${styles.tableCell}">${timestampToString(change.date)}</td>
+        <td style="${styles.tableCell}">${renderDiff(change.oldValue, change.value, change.property.type)}</td>
+      </tr>
+    `);
+  }
 
   return `
 <div>
@@ -228,7 +244,7 @@ const getElementParameters = (history, commentCount, propertiesToCheck, stringTo
       }
 
       changes.push({
-        type: property.title,
+        property: property,
         date: history[i][BASE_PROPERTIES.CREATED_TIMESTAMP],
         value: value,
         oldValue: oldValue

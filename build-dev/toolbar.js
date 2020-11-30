@@ -411,6 +411,12 @@ var BASE_PROPERTIES = {
     UPDATED_TIMESTAMP: '_uts',
     VERSION: '_v'
 };
+var PROPERTY_TYPES = {
+    NUMBER: 'number',
+    TEXT: 'text',
+    URL: 'url',
+    IMAGE: 'image'
+};
 
 var getContainer = function () {
     var windowWithContainer = window;
@@ -551,10 +557,6 @@ var renderElement = function (_a) {
             color: commentCount > 0 ? '#333' : '#999'
         }
     });
-    for (var _i = 0, changes_1 = changes; _i < changes_1.length; _i++) {
-        var change = changes_1[_i];
-        changesHTML.push("\n      <tr>\n        <td style=\"" + styles.tableCell + "\">" + change.type + "</td>\n        <td style=\"" + styles.tableCell + "\">" + timestampToString(change.date) + "</td>\n        <td style=\"" + styles.tableCell + "\">" + getTextDiff(change.oldValue, change.value) + "</td>\n      </tr>\n    ");
-    }
     var translations = {
         firstSaw: 'Első megtekintés',
         daysAgo: 'napja',
@@ -563,8 +565,28 @@ var renderElement = function (_a) {
         changesLabelType: 'Típus',
         changesLabelDate: 'Dátum',
         changesLabelValue: 'Érték',
-        comments: 'Hozzászólások'
+        comments: 'Hozzászólások',
+        oldUrl: 'Régi link',
+        newUrl: 'Új link',
+        oldImage: 'Régi kép',
+        newImage: 'Új kép'
     };
+    var renderDiff = function (oldValue, value, type) {
+        if (type === PROPERTY_TYPES.TEXT) {
+            return getTextDiff(oldValue, value);
+        }
+        else if (type === PROPERTY_TYPES.URL) {
+            return "<a href=\"" + (oldValue || '') + "\" target=\"_blank\" style=\"color: #ff4500;\">" + translations.oldUrl + "</a> - <a href=\"" + (value || '') + "\" target=\"_blank\" style=\"color: #39b54a;\">" + translations.newUrl + "</a>";
+        }
+        else if (type === PROPERTY_TYPES.IMAGE) {
+            return "<a href=\"" + (oldValue || '') + "\" target=\"_blank\" style=\"color: #ff4500;\">" + translations.oldImage + "</a> - <a href=\"" + (value || '') + "\" target=\"_blank\" style=\"color: #39b54a;\">" + translations.newImage + "</a>";
+        }
+        return "<span style=\"color: #ff4500; text-decoration: line-through;\">" + oldValue + "</span> <span style=\"color: #39b54a;\">" + value + "</span>";
+    };
+    for (var _i = 0, changes_1 = changes; _i < changes_1.length; _i++) {
+        var change = changes_1[_i];
+        changesHTML.push("\n      <tr>\n        <td style=\"" + styles.tableCell + "\">" + change.property.title + "</td>\n        <td style=\"" + styles.tableCell + "\">" + timestampToString(change.date) + "</td>\n        <td style=\"" + styles.tableCell + "\">" + renderDiff(change.oldValue, change.value, change.property.type) + "</td>\n      </tr>\n    ");
+    }
     return "\n<div>\n  <div style=\"" + styles.container + "\">\n    <span style=\"" + styles.logo + "\">M</span>\n    <span style=\"" + styles.date + "\" title=\"" + translations.firstSaw + ": " + timestampToString(creationDate) + "\">" + days + " " + translations.daysAgo + "</span>\n    <span style=\"" + styles.priceDifference + "\" title=\"" + translations.priceChange + "\">" + (priceDifference > 0 ? '+' : '') + numberToString(priceDifference) + (currency === null ? '' : " " + currency) + "</span>\n    <a style=\"" + styles.changesButton + "\" href=\"javascript:void(0);\">" + translations.changes + " (" + changes.length + ")</a>\n    <div style=\"" + styles.changes + "\">\n      <div style=\"" + styles.tableContainer + "\">\n        <div style=\"" + styles.tableContainerInner + "\">\n          <table style=\"" + styles.table + "\">\n            <thead>\n              <th style=\"" + styles.tableHeaderType + "\">" + translations.changesLabelType + "</th>\n              <th style=\"" + styles.tableHeaderDate + "\">" + translations.changesLabelDate + "</th>\n              <th style=\"" + styles.tableHeaderValue + "\">" + translations.changesLabelValue + "</th>\n            </thead>\n            <tbody>\n              " + changesHTML.map(function (html) { return html.trim(); }).join('') + "\n            </tbody>\n          </table>\n        </div>\n      </div>\n      <div>\n        <a href=\"javascript:void(0);\" style=\"" + styles.changesCloseButton + "\">X</a>\n      </div>\n    </div>\n    <a style=\"" + styles.commentsButton + "\" href=\"javascript:void(0);\">" + translations.comments + " (" + commentCount + ")</a>\n  </div>\n</div>\n";
 };
 var getElementParameters = function (history, commentCount, propertiesToCheck, stringToPrice) {
@@ -580,7 +602,7 @@ var getElementParameters = function (history, commentCount, propertiesToCheck, s
                 continue;
             }
             changes.push({
-                type: property.title,
+                property: property,
                 date: history[i][BASE_PROPERTIES.CREATED_TIMESTAMP],
                 value: value,
                 oldValue: oldValue
