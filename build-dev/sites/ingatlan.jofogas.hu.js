@@ -39,7 +39,6 @@ var getToolbar = function () {
     return getContainer().toolbar;
 };
 
-var _a;
 var NAMESPACE = 'ingatlan.jofogas.hu';
 var PROPERTIES = {
     TITLE: 'title',
@@ -49,19 +48,12 @@ var PROPERTIES = {
     DESCRIPTION: 'description'
 };
 var propertiesToCheck = [
-    PROPERTIES.TITLE,
-    PROPERTIES.PRICE,
-    PROPERTIES.URL,
-    PROPERTIES.PICTURE,
-    PROPERTIES.DESCRIPTION
+    { name: PROPERTIES.TITLE, title: 'Cím' },
+    { name: PROPERTIES.PRICE, title: 'Ár' },
+    { name: PROPERTIES.URL, title: 'Url' },
+    { name: PROPERTIES.PICTURE, title: 'Kép' },
+    { name: PROPERTIES.DESCRIPTION, title: 'Leírás' }
 ];
-var propertiesToCheckTranslations = (_a = {},
-    _a[PROPERTIES.TITLE] = 'Cím',
-    _a[PROPERTIES.PRICE] = 'Ár',
-    _a[PROPERTIES.URL] = 'Url',
-    _a[PROPERTIES.PICTURE] = 'Kép',
-    _a[PROPERTIES.DESCRIPTION] = 'Leírás',
-    _a);
 var getId = function (path) {
     return path.split('/').pop().split('.').slice(0, -1).join('.').split('_').pop();
 };
@@ -109,7 +101,7 @@ var start = function () {
             message: SERVICES.GET_LIST,
             items: items_1.map(function (item) { return getItemData(item); }),
             namespace: NAMESPACE,
-            propertiesToCheck: propertiesToCheck,
+            propertiesToCheck: propertiesToCheck.map(function (property) { return property.name; }),
             version: 1
         }, function (response) {
             for (var i = 0; i < items_1.length; i++) {
@@ -117,7 +109,7 @@ var start = function () {
                 div.style.position = 'absolute';
                 div.style.bottom = '0px';
                 items_1[i].getElementsByClassName('contentArea')[0].appendChild(div);
-                getToolbar().initToolbar(div, response.items[i], propertiesToCheck, propertiesToCheckTranslations, stringToPrice, openComments);
+                getToolbar().initToolbar(div, response.items[i], propertiesToCheck, stringToPrice, openComments);
             }
         });
     }

@@ -13,20 +13,12 @@ const PROPERTIES = {
 };
 
 const propertiesToCheck = [
-  PROPERTIES.TITLE,
-  PROPERTIES.PRICE,
-  PROPERTIES.URL,
-  PROPERTIES.PICTURE,
-  PROPERTIES.DESCRIPTION
+  { name: PROPERTIES.TITLE, title: 'Cím' },
+  { name: PROPERTIES.PRICE, title: 'Ár' },
+  { name: PROPERTIES.URL, title: 'Url' },
+  { name: PROPERTIES.PICTURE, title: 'Kép' },
+  { name: PROPERTIES.DESCRIPTION, title: 'Leírás' }
 ];
-
-const propertiesToCheckTranslations = {
-  [PROPERTIES.TITLE]: 'Cím',
-  [PROPERTIES.PRICE]: 'Ár',
-  [PROPERTIES.URL]: 'Url',
-  [PROPERTIES.PICTURE]: 'Kép',
-  [PROPERTIES.DESCRIPTION]: 'Leírás'
-};
 
 const getId = (path) => {
   const parts = path.split('/');
@@ -94,7 +86,7 @@ const start = () => {
       message: SERVICES.GET_LIST,
       items: items.map(item => getItemData(item)),
       namespace: NAMESPACE,
-      propertiesToCheck: propertiesToCheck,
+      propertiesToCheck: propertiesToCheck.map(property => property.name),
       version: 1
     }, (response) => {
       for (let i = 0; i < items.length; i++) {
@@ -105,7 +97,7 @@ const start = () => {
 
         items[i].appendChild(div);
 
-        getToolbar().initToolbar(div, response.items[i], propertiesToCheck, propertiesToCheckTranslations, stringToPrice, openComments);
+        getToolbar().initToolbar(div, response.items[i], propertiesToCheck, stringToPrice, openComments);
       }
     });
   }

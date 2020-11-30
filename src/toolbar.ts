@@ -212,7 +212,7 @@ const renderElement = ({
 `;
 };
 
-const getElementParameters = (history, commentCount, propertiesToCheck, propertiesToCheckTranslations, stringToPrice) => {
+const getElementParameters = (history, commentCount, propertiesToCheck, stringToPrice) => {
   const oldPrice = stringToPrice(history[0].price);
   const newPrice = stringToPrice(history[history.length - 1].price);
 
@@ -220,15 +220,15 @@ const getElementParameters = (history, commentCount, propertiesToCheck, properti
 
   for (let i = 1; i < history.length; i++) {
     for (const property of propertiesToCheck) {
-      const value = history[i][property];
-      const oldValue = history[i - 1][property];
+      const value = history[i][property.name];
+      const oldValue = history[i - 1][property.name];
 
       if (value === oldValue) {
         continue;
       }
 
       changes.push({
-        type: propertiesToCheckTranslations[property],
+        type: property.title,
         date: history[i][BASE_PROPERTIES.CREATED_TIMESTAMP],
         value: value,
         oldValue: oldValue
@@ -246,8 +246,8 @@ const getElementParameters = (history, commentCount, propertiesToCheck, properti
   };
 };
 
-const initToolbar = (root, item, propertiesToCheck, propertiesToCheckTranslations, stringToPrice, openComments) => {
-  const parameters = getElementParameters(item.history, item.commentCount, propertiesToCheck, propertiesToCheckTranslations, stringToPrice);
+const initToolbar = (root, item, propertiesToCheck, stringToPrice, openComments) => {
+  const parameters = getElementParameters(item.history, item.commentCount, propertiesToCheck, stringToPrice);
 
   root.innerHTML = renderElement(parameters).trim();
 
