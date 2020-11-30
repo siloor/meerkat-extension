@@ -178,9 +178,23 @@ const renderElement = ({
     if (type === PROPERTY_TYPES.TEXT) {
       return getTextDiff(oldValue, value);
     } else if (type === PROPERTY_TYPES.URL) {
-      return `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldUrl}</a> - <a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newUrl}</a>`;
+      return [
+        oldValue
+          ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldUrl}</a>`
+          : `<span style="text-decoration: line-through;">${translations.oldUrl}</span>`,
+        value
+          ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newUrl}</a>`
+          : `<span style="text-decoration: line-through;">${translations.newUrl}</span>`
+      ].join(' - ');
     } else if (type === PROPERTY_TYPES.IMAGE) {
-      return `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldImage}</a> - <a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newImage}</a>`;
+      return [
+        oldValue
+          ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldImage}</a>`
+          : `<span style="text-decoration: line-through;">${translations.oldImage}</span>`,
+        value
+          ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newImage}</a>`
+          : `<span style="text-decoration: line-through;">${translations.newImage}</span>`
+      ].join(' - ');
     }
 
     return `<span style="color: #ff4500; text-decoration: line-through;">${oldValue}</span> <span style="color: #39b54a;">${value}</span>`;
@@ -268,9 +282,10 @@ const initToolbar = (root, item, propertiesToCheck, stringToPrice, openComments)
   root.innerHTML = renderElement(parameters).trim();
 
   const element = root.firstElementChild;
-  const openButton = element.getElementsByTagName('a')[0];
-  const closeButton = element.getElementsByTagName('a')[1];
-  const commentsButton = element.getElementsByTagName('a')[2];
+  const linkElements = element.getElementsByTagName('a');
+  const openButton = linkElements[0];
+  const closeButton = linkElements[linkElements.length - 2];
+  const commentsButton = linkElements[linkElements.length - 1];
   const historyElement = openButton.nextElementSibling as HTMLElement;
 
   let isClosed = true;

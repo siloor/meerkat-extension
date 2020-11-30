@@ -576,10 +576,24 @@ var renderElement = function (_a) {
             return getTextDiff(oldValue, value);
         }
         else if (type === PROPERTY_TYPES.URL) {
-            return "<a href=\"" + (oldValue || '') + "\" target=\"_blank\" style=\"color: #ff4500;\">" + translations.oldUrl + "</a> - <a href=\"" + (value || '') + "\" target=\"_blank\" style=\"color: #39b54a;\">" + translations.newUrl + "</a>";
+            return [
+                oldValue
+                    ? "<a href=\"" + (oldValue || '') + "\" target=\"_blank\" style=\"color: #ff4500;\">" + translations.oldUrl + "</a>"
+                    : "<span style=\"text-decoration: line-through;\">" + translations.oldUrl + "</span>",
+                value
+                    ? "<a href=\"" + (value || '') + "\" target=\"_blank\" style=\"color: #39b54a;\">" + translations.newUrl + "</a>"
+                    : "<span style=\"text-decoration: line-through;\">" + translations.newUrl + "</span>"
+            ].join(' - ');
         }
         else if (type === PROPERTY_TYPES.IMAGE) {
-            return "<a href=\"" + (oldValue || '') + "\" target=\"_blank\" style=\"color: #ff4500;\">" + translations.oldImage + "</a> - <a href=\"" + (value || '') + "\" target=\"_blank\" style=\"color: #39b54a;\">" + translations.newImage + "</a>";
+            return [
+                oldValue
+                    ? "<a href=\"" + (oldValue || '') + "\" target=\"_blank\" style=\"color: #ff4500;\">" + translations.oldImage + "</a>"
+                    : "<span style=\"text-decoration: line-through;\">" + translations.oldImage + "</span>",
+                value
+                    ? "<a href=\"" + (value || '') + "\" target=\"_blank\" style=\"color: #39b54a;\">" + translations.newImage + "</a>"
+                    : "<span style=\"text-decoration: line-through;\">" + translations.newImage + "</span>"
+            ].join(' - ');
         }
         return "<span style=\"color: #ff4500; text-decoration: line-through;\">" + oldValue + "</span> <span style=\"color: #39b54a;\">" + value + "</span>";
     };
@@ -622,9 +636,10 @@ var initToolbar = function (root, item, propertiesToCheck, stringToPrice, openCo
     var parameters = getElementParameters(item.history, item.commentCount, propertiesToCheck, stringToPrice);
     root.innerHTML = renderElement(parameters).trim();
     var element = root.firstElementChild;
-    var openButton = element.getElementsByTagName('a')[0];
-    var closeButton = element.getElementsByTagName('a')[1];
-    var commentsButton = element.getElementsByTagName('a')[2];
+    var linkElements = element.getElementsByTagName('a');
+    var openButton = linkElements[0];
+    var closeButton = linkElements[linkElements.length - 2];
+    var commentsButton = linkElements[linkElements.length - 1];
     var historyElement = openButton.nextElementSibling;
     var isClosed = true;
     var documentClickHandler = function (e) {
