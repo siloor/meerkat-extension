@@ -94,7 +94,7 @@ const start = () => {
         div.style.float = 'left';
         div.style.width = '100%';
         div.style.position = 'relative';
-        div.style.zIndex = '150';
+        div.style.zIndex = '107';
 
         items[i].appendChild(div);
 

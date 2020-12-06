@@ -1,4 +1,6 @@
 import typescript from '@rollup/plugin-typescript';
+import copy from 'rollup-plugin-copy';
+import pjson from './package.json';
 
 const production = process.env.BUILD === 'production';
 
@@ -43,5 +45,18 @@ for (const input of inputs) {
     plugins: [typescript()]
   });
 }
+
+config[0].plugins.push(copy({
+  targets: [
+    { src: `assets/${production ? 'icons' : 'icons-dev'}/*`, dest: `${rootDir}/icons` },
+    { src: 'assets/options.html', dest: rootDir },
+    { src: 'assets/popup.html', dest: rootDir },
+    {
+      src: 'assets/manifest.json',
+      dest: rootDir,
+      transform: (contents) => contents.toString().replace('__VERSION__', pjson.version)
+    }
+  ]
+}));
 
 export default config;

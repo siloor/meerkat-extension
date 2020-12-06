@@ -119,7 +119,7 @@ var start = function () {
                 div.style.float = 'left';
                 div.style.width = '100%';
                 div.style.position = 'relative';
-                div.style.zIndex = '150';
+                div.style.zIndex = '107';
                 items_1[i].appendChild(div);
                 getToolbar().initToolbar(div, response.items[i], propertiesToCheck, stringToPrice, openComments);
             }
