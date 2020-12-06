@@ -10,6 +10,25 @@ const deleteButtonClickHandler = (e) => {
 };
 
 const renderStorageInfo = () => {
+  const translations = {
+    storageTitle: 'Tárolt adatok',
+    storageDomainLabel: 'Domain',
+    storageSizeLabel: 'Méret',
+    deleteButton: 'Törlés'
+  };
+
+  document.getElementsByClassName('options-block')[0].innerHTML = `
+    <h4>${translations.storageTitle}</h4>
+    <table id="storage-info">
+      <thead>
+      <th>${translations.storageDomainLabel}</th>
+      <th>${translations.storageSizeLabel}</th>
+      <th></th>
+      </thead>
+      <tbody></tbody>
+    </table>
+  `;
+
   chrome.runtime.sendMessage({
     message: SERVICES.GET_NAMESPACES_INFO
   }, (response) => {
@@ -22,12 +41,12 @@ const renderStorageInfo = () => {
     };
 
     storageInfoContainer.innerHTML = response.namespaces.map(namespace => `
-    <tr>
-      <td><img src="${faviconMap[namespace.name] || ''}" width="16" height="16" style="margin: 0 3px -3px 0;" /> ${namespace.name}</td>
-      <td>${namespace.megaBytesInUse} MB</td>
-      <td><button data-namespace="${namespace.name}">Törlés</button></td>
-    </tr>
-  `).join('');
+      <tr>
+        <td><img src="${faviconMap[namespace.name] || ''}" width="16" height="16" style="margin: 0 3px -3px 0;" /> ${namespace.name}</td>
+        <td>${namespace.megaBytesInUse} MB</td>
+        <td><button data-namespace="${namespace.name}">${translations.deleteButton}</button></td>
+      </tr>
+    `).join('');
 
     const buttons = storageInfoContainer.getElementsByTagName('button');
 
