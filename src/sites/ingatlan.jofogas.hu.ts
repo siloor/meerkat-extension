@@ -1,5 +1,6 @@
 import { BASE_PROPERTIES, SERVICES, PROPERTY_TYPES } from '../constants';
 import { textContentWithSeparator, removeUnnecessaryWhitespace } from '../utils';
+import { getTranslations } from '../translations';
 import { getToolbar } from '../dic';
 
 const NAMESPACE = 'ingatlan.jofogas.hu';
@@ -12,12 +13,29 @@ const PROPERTIES = {
   DESCRIPTION: 'description'
 };
 
+const translations = getTranslations({
+  en: {
+    [PROPERTIES.TITLE]: 'Title',
+    [PROPERTIES.PRICE]: 'Price',
+    [PROPERTIES.URL]: 'Url',
+    [PROPERTIES.PICTURE]: 'Picture',
+    [PROPERTIES.DESCRIPTION]: 'Description'
+  },
+  hu: {
+    [PROPERTIES.TITLE]: 'Cím',
+    [PROPERTIES.PRICE]: 'Ár',
+    [PROPERTIES.URL]: 'Url',
+    [PROPERTIES.PICTURE]: 'Kép',
+    [PROPERTIES.DESCRIPTION]: 'Leírás'
+  },
+});
+
 const propertiesToCheck = [
-  { name: PROPERTIES.TITLE, title: 'Cím', type: PROPERTY_TYPES.TEXT },
-  { name: PROPERTIES.PRICE, title: 'Ár', type: PROPERTY_TYPES.NUMBER },
-  { name: PROPERTIES.URL, title: 'Url', type: PROPERTY_TYPES.URL },
-  { name: PROPERTIES.PICTURE, title: 'Kép', type: PROPERTY_TYPES.IMAGE },
-  { name: PROPERTIES.DESCRIPTION, title: 'Leírás', type: PROPERTY_TYPES.TEXT }
+  { name: PROPERTIES.TITLE, title: translations[PROPERTIES.TITLE], type: PROPERTY_TYPES.TEXT },
+  { name: PROPERTIES.PRICE, title: translations[PROPERTIES.PRICE], type: PROPERTY_TYPES.NUMBER },
+  { name: PROPERTIES.URL, title: translations[PROPERTIES.URL], type: PROPERTY_TYPES.URL },
+  { name: PROPERTIES.PICTURE, title: translations[PROPERTIES.PICTURE], type: PROPERTY_TYPES.IMAGE },
+  { name: PROPERTIES.DESCRIPTION, title: translations[PROPERTIES.DESCRIPTION], type: PROPERTY_TYPES.TEXT }
 ];
 
 const getId = (path) => {
