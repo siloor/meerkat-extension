@@ -1,5 +1,6 @@
 import typescript from '@rollup/plugin-typescript';
 import copy from 'rollup-plugin-copy';
+import replace from '@rollup/plugin-replace';
 import pjson from './package.json';
 
 const production = process.env.BUILD === 'production';
@@ -18,6 +19,13 @@ const inputs = [
 
 const rootDir = production ? 'build' : 'build-dev';
 
+const commonPlugins = [
+  typescript(),
+  replace({
+    __buildEnv__: JSON.stringify(production ? 'production' : 'development')
+  })
+];
+
 for (const input of inputs) {
   if (!production && input === 'background.ts') {
     config.push({
@@ -28,7 +36,9 @@ for (const input of inputs) {
           format: 'esm'
         }
       ],
-      plugins: [typescript()]
+      plugins: [
+        ...commonPlugins
+      ]
     });
 
     continue;
@@ -42,7 +52,9 @@ for (const input of inputs) {
         format: 'esm'
       }
     ],
-    plugins: [typescript()]
+    plugins: [
+      ...commonPlugins
+    ]
   });
 }
 

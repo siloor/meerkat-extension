@@ -1,4 +1,12 @@
+declare global {
+  const __buildEnv__: string;
+}
+
 export const initAnalytics = () => {
+  if (__buildEnv__ !== 'production') {
+    return;
+  }
+
   // Standard Google Universal Analytics code
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=(new Date()).getTime();a=s.createElement(o),
@@ -12,5 +20,9 @@ export const initAnalytics = () => {
 };
 
 export const sendEvent = (category, action, label) => {
+  if (__buildEnv__ !== 'production') {
+    return;
+  }
+
   window['ga']('send', 'event', category, action, label);
 };

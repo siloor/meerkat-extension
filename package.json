@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@rollup/plugin-replace": "^2.3.4",
     "@rollup/plugin-typescript": "^6.0.0",
     "@types/chrome": "0.0.123",
     "@types/jest": "^26.0.14",
