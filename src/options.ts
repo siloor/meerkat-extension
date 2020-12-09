@@ -1,4 +1,5 @@
 import { SERVICES } from './constants';
+import { getTranslations } from './translations';
 
 const deleteButtonClickHandler = (e) => {
   chrome.runtime.sendMessage({
@@ -10,12 +11,20 @@ const deleteButtonClickHandler = (e) => {
 };
 
 const renderStorageInfo = () => {
-  const translations = {
-    storageTitle: 'Tárolt adatok',
-    storageDomainLabel: 'Domain',
-    storageSizeLabel: 'Méret',
-    deleteButton: 'Törlés'
-  };
+  const translations = getTranslations({
+    en: {
+      storageTitle: 'Storage',
+      storageDomainLabel: 'Domain',
+      storageSizeLabel: 'Size',
+      deleteButton: 'Delete'
+    },
+    hu: {
+      storageTitle: 'Tárolt adatok',
+      storageDomainLabel: 'Domain',
+      storageSizeLabel: 'Méret',
+      deleteButton: 'Törlés'
+    }
+  });
 
   document.getElementsByClassName('options-block')[0].innerHTML = `
     <h4>${translations.storageTitle}</h4>

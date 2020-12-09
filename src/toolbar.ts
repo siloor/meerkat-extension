@@ -1,6 +1,7 @@
 import { diffHTML } from './Diffr';
 import { BASE_PROPERTIES, PROPERTY_TYPES } from './constants';
 import { setToolbar } from './dic';
+import { getTranslations } from './translations';
 
 const timestampToString = (timestamp) => {
   const date = new Date(timestamp);
@@ -159,20 +160,36 @@ const renderElement = ({
     }
   });
 
-  const translations = {
-    firstSaw: 'Első megtekintés',
-    daysAgo: 'napja',
-    priceChange: 'Árváltozás',
-    changes: 'Változások',
-    changesLabelType: 'Típus',
-    changesLabelDate: 'Dátum',
-    changesLabelValue: 'Érték',
-    comments: 'Hozzászólások',
-    oldUrl: 'Régi link',
-    newUrl: 'Új link',
-    oldImage: 'Régi kép',
-    newImage: 'Új kép'
-  };
+  const translations = getTranslations({
+    en: {
+      firstSaw: 'First saw',
+      daysAgo: 'days ago',
+      priceChange: 'Price change',
+      changes: 'Changes',
+      changesLabelType: 'Type',
+      changesLabelDate: 'Date',
+      changesLabelValue: 'Value',
+      comments: 'Comments',
+      oldUrl: 'Old link',
+      newUrl: 'New link',
+      oldImage: 'Old image',
+      newImage: 'New image'
+    },
+    hu: {
+      firstSaw: 'Első megtekintés',
+      daysAgo: 'napja',
+      priceChange: 'Árváltozás',
+      changes: 'Változások',
+      changesLabelType: 'Típus',
+      changesLabelDate: 'Dátum',
+      changesLabelValue: 'Érték',
+      comments: 'Hozzászólások',
+      oldUrl: 'Régi link',
+      newUrl: 'Új link',
+      oldImage: 'Régi kép',
+      newImage: 'Új kép'
+    }
+  });
 
   const renderDiff = (oldValue, value, type) => {
     if (type === PROPERTY_TYPES.TEXT) {
