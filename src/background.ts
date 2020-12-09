@@ -36,11 +36,15 @@ const getCommentsCount = (namespace, ids, cb) => {
   xhr.open("GET", `https://disqus.com/api/3.0/threads/set.json?forum=meerkat-for-a-transparent-market&api_key=${apiKey}${idsParam}`, true);
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4) {
-      const resp = JSON.parse(xhr.responseText);
+      let threads = [];
+
+      try {
+        threads = JSON.parse(xhr.responseText).response;
+      } catch(e) { }
 
       const countMap = {};
 
-      for (const thread of resp.response) {
+      for (const thread of threads) {
         const id = thread.identifiers[0].replace(/^\//, '').replace(`${namespace}_`, '');
 
         countMap[id] = thread.posts;
