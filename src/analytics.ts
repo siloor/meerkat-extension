@@ -1,5 +1,6 @@
 declare global {
   const __buildEnv__: string;
+  const __buildVersion__: string;
 }
 
 export const initAnalytics = () => {
@@ -16,7 +17,7 @@ export const initAnalytics = () => {
   window['ga']('create', 'UA-127764423-2', 'auto');
   window['ga']('set', 'checkProtocolTask', function(){}); // Removes failing protocol check. @see: http://stackoverflow.com/a/22152353/1958200
   window['ga']('require', 'displayfeatures');
-  window['ga']('send', 'pageview', '/background.html'); // Specify the virtual path
+  window['ga']('send', 'pageview', `/background.html?version=${__buildVersion__}`); // Specify the virtual path
 };
 
 export const sendEvent = (category, action, label) => {

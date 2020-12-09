@@ -197,6 +197,8 @@ chrome.runtime.onMessage.addListener(
 
       return true;
     } else if (request.message === SERVICES.OPEN_COMMENTS) {
+      sendEvent('extension', 'openComments', request.namespace);
+
       const width = 900;
       const height = 700;
       const left = (screen.width - width) / 2;

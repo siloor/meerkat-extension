@@ -22,7 +22,8 @@ const rootDir = production ? 'build' : 'build-dev';
 const commonPlugins = [
   typescript(),
   replace({
-    __buildEnv__: JSON.stringify(production ? 'production' : 'development')
+    __buildEnv__: JSON.stringify(production ? 'production' : 'development'),
+    __buildVersion__: JSON.stringify(pjson.version)
   })
 ];
 
