@@ -16,5 +16,5 @@ document.querySelector('#info-description').innerHTML = data.description;
 
 document.querySelector('#disqus-comments').setAttribute(
   'src',
-  `https://siloor.github.io/meerkat-for-a-transparent-market/disqus.html?id=${encodeURIComponent(data.disqusIdentifier)}`
+  `https://siloor.github.io/meerkat-for-a-transparent-market/disqus.html?id=${encodeURIComponent(data.disqusIdentifier)}&language=${encodeURIComponent(data.language)}`
 );

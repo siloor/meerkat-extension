@@ -1,6 +1,6 @@
 import { BASE_PROPERTIES, SERVICES, PROPERTY_TYPES } from '../constants';
 import { textContentWithSeparator, removeUnnecessaryWhitespace } from '../utils';
-import { getTranslations } from '../translations';
+import { getLanguage, getTranslations } from '../translations';
 import { getToolbar } from '../dic';
 
 const NAMESPACE = 'hasznaltauto.hu';
@@ -27,7 +27,7 @@ const translations = getTranslations({
     [PROPERTIES.URL]: 'Url',
     [PROPERTIES.PICTURE]: 'Kép',
     [PROPERTIES.DESCRIPTION]: 'Leírás'
-  },
+  }
 });
 
 const propertiesToCheck = [
@@ -89,6 +89,7 @@ const openComments = (item) => {
   chrome.runtime.sendMessage({
     message: SERVICES.OPEN_COMMENTS,
     namespace: NAMESPACE,
+    language: getLanguage(),
     id: state[BASE_PROPERTIES.ID],
     title: state[PROPERTIES.TITLE],
     description: state[PROPERTIES.DESCRIPTION],

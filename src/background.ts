@@ -200,6 +200,7 @@ chrome.runtime.onMessage.addListener(
 
       const data = {
         disqusIdentifier: getDisqusIdentifier(request.namespace, request.id),
+        language: request.language,
         title: request.title,
         description: request.description,
         picture: request.picture

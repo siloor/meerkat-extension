@@ -17,7 +17,7 @@
 
     var disqus_config = function () {
       this.page.identifier = '/' + urlParams.get('id');
-      this.language = 'hu';
+      this.language = urlParams.get('language');
     };
     (function() {
       var d = document, s = d.createElement('script');
