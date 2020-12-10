@@ -62,6 +62,44 @@ const getCommentsCount = (namespace, ids, cb) => {
   xhr.send();
 };
 
+const getStoreVersion = (cb) => {
+  chrome.storage.local.get('version', (result) => {
+    cb(result.version || 1);
+  });
+};
+
+const setStoreVersion = (version, cb) => {
+  chrome.storage.local.set({ version: version }, () => {
+    cb();
+  });
+};
+
+const migrate1to2 = (cb) => {
+  chrome.storage.local.get(null, (items) => {
+    const newItems = {};
+
+    for (const itemKey of Object.keys(items)) {
+      if (itemKey.indexOf('item_') === 0) {
+        newItems[itemKey] = { history: items[itemKey] };
+      }
+    }
+
+    chrome.storage.local.set(newItems, () => {
+      cb();
+    });
+  });
+};
+
+const migrate = () => {
+  getStoreVersion((version) => {
+    if (version === 1) {
+      migrate1to2(() => {
+        setStoreVersion(2, () => {});
+      });
+    }
+  });
+};
+
 const getList = (sendResponse, namespace, propertiesToCheck, version, items, timestamp) => {
   const originalOrder = items.map(item => item[BASE_PROPERTIES.ID]);
 
@@ -72,27 +110,29 @@ const getList = (sendResponse, namespace, propertiesToCheck, version, items, tim
         const key = getItemStorageKey(namespace, item[BASE_PROPERTIES.ID]);
 
         if (!savedItems[key]) {
-          savedItems[key] = [];
+          savedItems[key] = { history: [] };
         }
 
+        const savedItemHistory = savedItems[key].history;
+
         if (getIsNewState(
-          savedItems[key].length === 0 ? null : savedItems[key][savedItems[key].length - 1],
+          savedItemHistory.length === 0 ? null : savedItemHistory[savedItemHistory.length - 1],
           item,
           propertiesToCheck
         )) {
-          savedItems[key].push({
+          savedItemHistory.push({
             ...item,
             [BASE_PROPERTIES.CREATED_TIMESTAMP]: timestamp,
             [BASE_PROPERTIES.UPDATED_TIMESTAMP]: null,
             [BASE_PROPERTIES.VERSION]: version
           });
         } else {
-          savedItems[key][savedItems[key].length - 1][BASE_PROPERTIES.UPDATED_TIMESTAMP] = timestamp;
+          savedItemHistory[savedItemHistory.length - 1][BASE_PROPERTIES.UPDATED_TIMESTAMP] = timestamp;
         }
       }
 
       chrome.storage.local.set(savedItems, () => {
-        const itemsHistory = Object.values(savedItems);
+        const itemsHistory = Object.values(savedItems).map(savedItem => savedItem.history);
 
         itemsHistory.sort((a, b) => {
           const aIndex = originalOrder.indexOf(a[0][BASE_PROPERTIES.ID]);
@@ -222,5 +262,7 @@ chrome.runtime.onMessage.addListener(
     }
   }
 );
+
+migrate();
 
 initAnalytics();
