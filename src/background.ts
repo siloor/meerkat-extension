@@ -1,5 +1,6 @@
 import { BASE_PROPERTIES, SERVICES } from './constants';
 import { initAnalytics, sendEvent } from './analytics';
+import { storage } from './storage';
 
 const getItemStorageKey = (namespace, id) => {
   return `item_${namespace}_${id}`;
@@ -62,162 +63,153 @@ const getCommentsCount = (namespace, ids, cb) => {
   xhr.send();
 };
 
-const getStoreVersion = (cb) => {
-  chrome.storage.local.get('version', (result) => {
-    cb(result.version || 1);
-  });
+const getStoreVersion = async () => {
+  const result = await storage.get('version');
+
+  return result.version || 1;
 };
 
-const setStoreVersion = (version, cb) => {
-  chrome.storage.local.set({ version: version }, () => {
-    cb();
-  });
+const setStoreVersion = async (version) => {
+  await storage.set({ version: version });
 };
 
-const migrate1to2 = (cb) => {
-  chrome.storage.local.get(null, (items) => {
-    const newItems = {};
+const migrate1to2 = async () => {
+  const items = await storage.get(null);
 
-    for (const itemKey of Object.keys(items)) {
-      if (itemKey.indexOf('item_') === 0) {
-        newItems[itemKey] = { history: items[itemKey] };
-      }
+  const newItems = {};
+
+  for (const itemKey of Object.keys(items)) {
+    if (itemKey.indexOf('item_') === 0) {
+      newItems[itemKey] = { history: items[itemKey] };
     }
+  }
 
-    chrome.storage.local.set(newItems, () => {
-      cb();
-    });
-  });
+  await storage.set(newItems);
 };
 
-const migrate = () => {
-  getStoreVersion((version) => {
-    if (version === 1) {
-      migrate1to2(() => {
-        setStoreVersion(2, () => {});
-      });
-    }
-  });
+const migrate = async () => {
+  const version = await getStoreVersion();
+
+  if (version === 1) {
+    await migrate1to2();
+
+    await setStoreVersion(2);
+  }
 };
 
-const getList = (sendResponse, namespace, propertiesToCheck, version, items, timestamp) => {
+const getList = async (sendResponse, namespace, propertiesToCheck, version, items, timestamp) => {
   const originalOrder = items.map(item => item[BASE_PROPERTIES.ID]);
 
-  chrome.storage.local.get(
-    items.map(item => getItemStorageKey(namespace, item[BASE_PROPERTIES.ID])),
-    (savedItems) => {
-      for (const item of items) {
-        const key = getItemStorageKey(namespace, item[BASE_PROPERTIES.ID]);
+  const savedItems = await storage.get(items.map(item => getItemStorageKey(namespace, item[BASE_PROPERTIES.ID])));
 
-        if (!savedItems[key]) {
-          savedItems[key] = { history: [] };
-        }
+  for (const item of items) {
+    const key = getItemStorageKey(namespace, item[BASE_PROPERTIES.ID]);
 
-        const savedItemHistory = savedItems[key].history;
+    if (!savedItems[key]) {
+      savedItems[key] = { history: [] };
+    }
 
-        if (getIsNewState(
-          savedItemHistory.length === 0 ? null : savedItemHistory[savedItemHistory.length - 1],
-          item,
-          propertiesToCheck
-        )) {
-          savedItemHistory.push({
-            ...item,
-            [BASE_PROPERTIES.CREATED_TIMESTAMP]: timestamp,
-            [BASE_PROPERTIES.UPDATED_TIMESTAMP]: null,
-            [BASE_PROPERTIES.VERSION]: version
-          });
-        } else {
-          savedItemHistory[savedItemHistory.length - 1][BASE_PROPERTIES.UPDATED_TIMESTAMP] = timestamp;
-        }
-      }
+    const savedItemHistory = savedItems[key].history;
 
-      chrome.storage.local.set(savedItems, () => {
-        const itemsHistory = Object.values(savedItems).map(savedItem => savedItem.history);
-
-        itemsHistory.sort((a, b) => {
-          const aIndex = originalOrder.indexOf(a[0][BASE_PROPERTIES.ID]);
-          const bIndex = originalOrder.indexOf(b[0][BASE_PROPERTIES.ID]);
-
-          if (aIndex === bIndex) {
-            return 0;
-          }
-
-          return aIndex > bIndex ? 1 : -1;
-        });
-
-        getCommentsCount(
-          namespace,
-          itemsHistory.map(history => history[0][BASE_PROPERTIES.ID]),
-          (commentCountMap) => {
-            const itemObjects = itemsHistory.map(history => ({
-              history: history,
-              commentCount: commentCountMap[history[0][BASE_PROPERTIES.ID]]
-            }));
-
-            sendResponse({ items: itemObjects });
-          }
-        );
+    if (getIsNewState(
+      savedItemHistory.length === 0 ? null : savedItemHistory[savedItemHistory.length - 1],
+      item,
+      propertiesToCheck
+    )) {
+      savedItemHistory.push({
+        ...item,
+        [BASE_PROPERTIES.CREATED_TIMESTAMP]: timestamp,
+        [BASE_PROPERTIES.UPDATED_TIMESTAMP]: null,
+        [BASE_PROPERTIES.VERSION]: version
       });
+    } else {
+      savedItemHistory[savedItemHistory.length - 1][BASE_PROPERTIES.UPDATED_TIMESTAMP] = timestamp;
+    }
+  }
+
+  await storage.set(savedItems);
+
+  const itemsHistory = Object.values(savedItems).map(savedItem => savedItem.history);
+
+  itemsHistory.sort((a, b) => {
+    const aIndex = originalOrder.indexOf(a[0][BASE_PROPERTIES.ID]);
+    const bIndex = originalOrder.indexOf(b[0][BASE_PROPERTIES.ID]);
+
+    if (aIndex === bIndex) {
+      return 0;
+    }
+
+    return aIndex > bIndex ? 1 : -1;
+  });
+
+  getCommentsCount(
+    namespace,
+    itemsHistory.map(history => history[0][BASE_PROPERTIES.ID]),
+    (commentCountMap) => {
+      const itemObjects = itemsHistory.map(history => ({
+        history: history,
+        commentCount: commentCountMap[history[0][BASE_PROPERTIES.ID]]
+      }));
+
+      sendResponse({ items: itemObjects });
     }
   );
 };
 
-const getNamespacesInfo = (sendResponse) => {
-  chrome.storage.local.get(null, (items) => {
-    const namespaces = {};
+const getNamespacesInfo = async (sendResponse) => {
+  const items = await storage.get(null);
 
-    for (const itemKey of Object.keys(items)) {
-      const namespace = getNamespaceFromStorageKey(itemKey);
+  const namespaces = {};
 
-      if (!namespaces[namespace]) {
-        namespaces[namespace] = {
-          keys: [],
-          megaBytesInUse: null
-        };
-      }
+  for (const itemKey of Object.keys(items)) {
+    const namespace = getNamespaceFromStorageKey(itemKey);
 
-      namespaces[namespace].keys.push(itemKey);
+    if (namespace === null) {
+      continue;
     }
 
-    let remainingBytesInUse = Object.keys(namespaces).length;
-
-    for (const namespace of Object.keys(namespaces)) {
-      chrome.storage.local.getBytesInUse(namespaces[namespace].keys, (bytesInUse) => {
-        remainingBytesInUse--;
-
-        namespaces[namespace].megaBytesInUse = Math.round((bytesInUse / 1024 / 1024) * 100) / 100;
-
-        if (remainingBytesInUse === 0) {
-          sendResponse({
-            namespaces: Object.keys(namespaces).map(namespace => {
-              return {
-                name: namespace,
-                megaBytesInUse: namespaces[namespace].megaBytesInUse
-              };
-            })
-          });
-        }
-      });
+    if (!namespaces[namespace]) {
+      namespaces[namespace] = {
+        keys: [],
+        megaBytesInUse: null
+      };
     }
+
+    namespaces[namespace].keys.push(itemKey);
+  }
+
+  for (const namespace of Object.keys(namespaces)) {
+    const bytesInUse = await storage.getBytesInUse(namespaces[namespace].keys);
+
+    namespaces[namespace].megaBytesInUse = Math.round((bytesInUse / 1024 / 1024) * 100) / 100;
+  }
+
+  sendResponse({
+    namespaces: Object.keys(namespaces).map(namespace => {
+      return {
+        name: namespace,
+        megaBytesInUse: namespaces[namespace].megaBytesInUse
+      };
+    })
   });
 };
 
-const clearNamespace = (sendResponse, namespace) => {
-  chrome.storage.local.get(null, (items) => {
-    const keys = [];
+const clearNamespace = async (sendResponse, namespace) => {
+  const items = await storage.get(null);
 
-    for (const itemKey of Object.keys(items)) {
-      const namespaceFromKey = getNamespaceFromStorageKey(itemKey);
+  const keys = [];
 
-      if (namespaceFromKey === namespace) {
-        keys.push(itemKey);
-      }
+  for (const itemKey of Object.keys(items)) {
+    const namespaceFromKey = getNamespaceFromStorageKey(itemKey);
+
+    if (namespaceFromKey === namespace) {
+      keys.push(itemKey);
     }
+  }
 
-    chrome.storage.local.remove(keys, () => {
-      sendResponse({ success: true });
-    });
-  });
+  await storage.remove(keys);
+
+  sendResponse({ success: true });
 };
 
 chrome.runtime.onMessage.addListener(
