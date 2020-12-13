@@ -258,3 +258,15 @@ chrome.runtime.onMessage.addListener(
 migrate();
 
 initAnalytics();
+
+chrome.runtime.onInstalled.addListener(function (details) {
+  if (details.reason === 'install') {
+    chrome.tabs.create({
+      url: 'https://siloor.github.io/meerkat-for-a-transparent-market/installed/'
+    });
+  } else if (details.reason === 'update') {
+    chrome.tabs.create({
+      url: 'https://siloor.github.io/meerkat-for-a-transparent-market/upgraded/'
+    });
+  }
+});
