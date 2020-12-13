@@ -1,0 +1,65 @@
+---
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Upgraded - Meerkat - For a Transparent Market</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto" />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Roboto', serif;
+      }
+
+      .header-container {
+        background: #4aeebb;
+        overflow: auto;
+      }
+
+      .header {
+        max-width: 1180px;
+        padding: 0 10px;
+        margin: 40px auto 100px auto;
+      }
+
+      .header-title {
+        text-align: center;
+        font-size: 30px;
+      }
+
+      .header-info {
+        text-align: center;
+        font-size: 20px;
+        margin-top: 10px;
+      }
+
+      .main-container {
+        overflow: auto;
+      }
+
+      .main {
+        max-width: 1180px;
+        padding: 0 10px;
+        margin: 80px auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header-container">
+      <div class="header">
+        <div class="header-logo"><img src="../static/img/icon.512x512.png" width="64" height="64" /></div>
+        <div class="header-title">Meerkat has been upgraded</div>
+        <div class="header-info">v0.0.6</div>
+      </div>
+    </div>
+    <div class="main-container">
+      <div class="main">
+        {% capture readme %}{% include CHANGELOG.md %}{% endcapture %}
+        {{ readme | markdownify }}
+      </div>
+    </div>
+  </body>
+</html>
