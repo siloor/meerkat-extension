@@ -1,8 +1,3 @@
-declare global {
-  const __buildEnv__: string;
-  const __buildVersion__: string;
-}
-
 export const initAnalytics = () => {
   if (__buildEnv__ !== 'production') {
     return;
