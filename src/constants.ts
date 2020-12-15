@@ -9,7 +9,8 @@ export const SERVICES = {
   GET_LIST: 'get_list',
   GET_NAMESPACES_INFO: 'get_namespaces_info',
   CLEAR_NAMESPACE: 'clear_namespace',
-  OPEN_COMMENTS: 'open_comments'
+  OPEN_COMMENTS: 'open_comments',
+  SET_COLOR: 'set_color'
 };
 
 export const PROPERTY_TYPES = {

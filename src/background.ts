@@ -130,11 +130,11 @@ const getList = async (sendResponse, namespace, propertiesToCheck, version, item
 
   await storage.set(savedItems);
 
-  const itemsHistory = Object.values(savedItems).map(savedItem => savedItem.history);
+  const newItems = Object.values(savedItems);
 
-  itemsHistory.sort((a, b) => {
-    const aIndex = originalOrder.indexOf(a[0][BASE_PROPERTIES.ID]);
-    const bIndex = originalOrder.indexOf(b[0][BASE_PROPERTIES.ID]);
+  newItems.sort((a, b) => {
+    const aIndex = originalOrder.indexOf(a.history[0][BASE_PROPERTIES.ID]);
+    const bIndex = originalOrder.indexOf(b.history[0][BASE_PROPERTIES.ID]);
 
     if (aIndex === bIndex) {
       return 0;
@@ -145,11 +145,12 @@ const getList = async (sendResponse, namespace, propertiesToCheck, version, item
 
   getCommentsCount(
     namespace,
-    itemsHistory.map(history => history[0][BASE_PROPERTIES.ID]),
+    newItems.map(item => item.history[0][BASE_PROPERTIES.ID]),
     (commentCountMap) => {
-      const itemObjects = itemsHistory.map(history => ({
-        history: history,
-        commentCount: commentCountMap[history[0][BASE_PROPERTIES.ID]]
+      const itemObjects = newItems.map(item => ({
+        history: item.history,
+        color: item.color,
+        commentCount: commentCountMap[item.history[0][BASE_PROPERTIES.ID]]
       }));
 
       sendResponse({ items: itemObjects });
@@ -213,6 +214,22 @@ const clearNamespace = async (sendResponse, namespace) => {
   sendResponse({ success: true });
 };
 
+const setColor = async (sendResponse, namespace, id, color) => {
+  const itemKey = getItemStorageKey(namespace, id);
+
+  const item = (await storage.get(itemKey))[itemKey];
+
+  if (color === null) {
+    delete item.color;
+  } else {
+    item.color = color;
+  }
+
+  await storage.set({ [itemKey]: item });
+
+  sendResponse();
+};
+
 chrome.runtime.onMessage.addListener(
   (request, sender, sendResponse) => {
     if (request.message === SERVICES.GET_LIST) {
@@ -250,6 +267,10 @@ chrome.runtime.onMessage.addListener(
         'extension_popup',
         `width=${width},height=${height},top=${top},left=${left}`
       );
+
+      return true;
+    } else if (request.message === SERVICES.SET_COLOR) {
+      setColor(sendResponse, request.namespace, request.id, request.color);
 
       return true;
     }

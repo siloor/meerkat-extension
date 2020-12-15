@@ -94,6 +94,17 @@ const openComments = (item) => {
   }, (response) => {});
 };
 
+const setColor = (item, color) => {
+  const state = item.history[item.history.length - 1];
+
+  chrome.runtime.sendMessage({
+    message: SERVICES.SET_COLOR,
+    namespace: NAMESPACE,
+    id: state[BASE_PROPERTIES.ID],
+    color: color
+  }, (response) => {});
+};
+
 const start = () => {
   if (window.location.pathname.indexOf('/lista') === 0 || window.location.pathname.indexOf('/szukites') === 0) {
     const items = [].slice.call(document.getElementsByClassName('listing'));
@@ -115,7 +126,7 @@ const start = () => {
 
         items[i].appendChild(div);
 
-        getToolbar().initToolbar(div, response.items[i], propertiesToCheck, stringToPrice, openComments);
+        getToolbar().initToolbar(div, response.items[i], propertiesToCheck, stringToPrice, openComments, setColor);
       }
     });
   }

@@ -3,6 +3,45 @@ import { BASE_PROPERTIES, PROPERTY_TYPES } from './constants';
 import { setToolbar } from './dic';
 import { getTranslations } from './translations';
 
+const colors = {
+  default: {
+    containerBackground: '#eee'
+  },
+  red: {
+    containerBackground: '#f28b82'
+  },
+  orange: {
+    containerBackground: '#fabe43'
+  },
+  yellow: {
+    containerBackground: '#feeb75'
+  },
+  green: {
+    containerBackground: '#c9eb8f'
+  },
+  teal: {
+    containerBackground: '#a5f8ea'
+  },
+  blue: {
+    containerBackground: '#cbf0f8'
+  },
+  darkBlue: {
+    containerBackground: '#aecbfa'
+  },
+  purple: {
+    containerBackground: '#d7aefb'
+  },
+  pink: {
+    containerBackground: '#fbcfe8'
+  },
+  brown: {
+    containerBackground: '#e6c9a8'
+  },
+  gray: {
+    containerBackground: '#e8eaed'
+  }
+};
+
 const timestampToString = (timestamp) => {
   const date = new Date(timestamp);
 
@@ -49,10 +88,9 @@ const renderElement = ({
   priceDifference,
   currency,
   commentCount,
+  color,
   changes
 }) => {
-  const changesHTML = [];
-
   const commonStyles = {
     tableHeader: {
       padding: '8px',
@@ -72,16 +110,18 @@ const renderElement = ({
       textAlign: 'center',
       fontSize: '14px',
       fontWeight: 'bold',
-      backgroundColor: '#ccc',
+      backgroundColor: 'rgba(0, 0, 0, 0.15)',
       color: '#fff'
     }
   };
+
+  const theme = color && colors[color] ? colors[color] : colors.default;
 
   const styles = generateStyles({
     container: {
       position: 'relative',
       float: 'left',
-      background: '#eee',
+      background: theme.containerBackground,
       borderRadius: '16px',
       padding: '8px',
       boxShadow: '0 1px 2px rgba(0,0,0,0.16), 0 1px 2px rgba(0,0,0,0.23)',
@@ -93,19 +133,20 @@ const renderElement = ({
     },
     date: {
       marginLeft: '20px',
-      color: '#999'
+      color: 'rgba(0, 0, 0, 0.4)'
     },
     priceDifference: {
       marginLeft: '20px',
       fontWeight: priceDifference === 0 || priceDifference === null ? 'normal' : 'bold',
-      color: priceDifference === 0 || priceDifference === null ? '#999' : (priceDifference > 0 ? '#ff4500' : '#39b54a')
+      color: priceDifference === 0 || priceDifference === null ? 'rgba(0, 0, 0, 0.4)' : (priceDifference > 0 ? '#ff4500' : '#39b54a')
     },
     changesButton: {
       marginLeft: '20px',
-      color: changes.length > 0 ? '#333' : '#999'
+      color: changes.length > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'
     },
     changes: {
       position: 'absolute',
+      zIndex: '1',
       bottom: '0',
       left: '0',
       background: '#eee',
@@ -156,7 +197,34 @@ const renderElement = ({
     commentsButton: {
       marginLeft: '20px',
       marginRight: '10px',
-      color: commentCount > 0 ? '#333' : '#999'
+      color: commentCount > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'
+    },
+    colorsButton: {
+      marginRight: '6px',
+      float: 'right',
+      width: '20px',
+      height: '20px',
+      boxShadow: '0 0 4px rgba(0, 0, 0, 0.4)',
+      borderRadius: '10px',
+      position: 'relative'
+    },
+    colorsContainer: {
+      display: 'none',
+      position: 'absolute',
+      bottom: '20px',
+      left: '0',
+      width: '168px',
+      height: '60px',
+      background: 'rgba(0, 0, 0, 0.4)',
+      borderRadius: '10px'
+    },
+    colorsContainerColor: {
+      display: 'inline-block',
+      width: '20px',
+      height: '20px',
+      boxShadow: '0 0 4px rgba(0, 0, 0, 0.4)',
+      borderRadius: '10px',
+      margin: '4px'
     }
   });
 
@@ -217,6 +285,8 @@ const renderElement = ({
     return `<span style="color: #ff4500; text-decoration: line-through;">${oldValue}</span> <span style="color: #39b54a;">${value}</span>`;
   };
 
+  const changesHTML = [];
+
   for (const change of changes) {
     changesHTML.push(`
       <tr>
@@ -227,13 +297,21 @@ const renderElement = ({
     `);
   }
 
+  const colorsHTML = [];
+
+  for (const colorKey of Object.keys(colors)) {
+    colorsHTML.push(`
+      <a href="javascript:void(0);" style="${styles.colorsContainerColor} background-color: ${colors[colorKey].containerBackground}" title="${colorKey}" data-color-key="${colorKey}" class="meerkat-colors-color-button"></a>
+    `);
+  }
+
   return `
 <div>
   <div style="${styles.container}">
     <span style="${styles.logo}">M</span>
     <span style="${styles.date}" title="${translations.firstSaw}: ${timestampToString(creationDate)}">${days} ${translations.daysAgo}</span>
     <span style="${styles.priceDifference}" title="${translations.priceChange}">${priceDifference > 0 ? '+' : ''}${numberToString(priceDifference)}${currency === null ? '' : ` ${currency}`}</span>
-    <a style="${styles.changesButton}" href="javascript:void(0);">${translations.changes} (${changes.length})</a>
+    <a style="${styles.changesButton}" href="javascript:void(0);" class="meerkat-changes-button">${translations.changes} (${changes.length})</a>
     <div style="${styles.changes}">
       <div style="${styles.tableContainer}">
         <div style="${styles.tableContainerInner}">
@@ -250,16 +328,21 @@ const renderElement = ({
         </div>
       </div>
       <div>
-        <a href="javascript:void(0);" style="${styles.changesCloseButton}">X</a>
+        <a href="javascript:void(0);" style="${styles.changesCloseButton}" class="meerkat-changes-close-button">X</a>
       </div>
     </div>
-    <a style="${styles.commentsButton}" href="javascript:void(0);">${translations.comments} (${commentCount})</a>
+    <a style="${styles.commentsButton}" href="javascript:void(0);" class="meerkat-comments-button">${translations.comments} (${commentCount})</a>
+    <div style="${styles.colorsButton}" href="javascript:void(0);" class="meerkat-colors-button">
+      <div style="${styles.colorsContainer}">
+        ${colorsHTML.map(html => html.trim()).join('')}
+      </div>
+    </div>
   </div>
 </div>
 `;
 };
 
-const getElementParameters = (history, commentCount, propertiesToCheck, stringToPrice) => {
+const getElementParameters = (history, commentCount, color, propertiesToCheck, stringToPrice) => {
   const oldPrice = stringToPrice(history[0].price);
   const newPrice = stringToPrice(history[history.length - 1].price);
 
@@ -289,20 +372,22 @@ const getElementParameters = (history, commentCount, propertiesToCheck, stringTo
     priceDifference: oldPrice.value === null && newPrice.value === null ? null : newPrice.value - oldPrice.value,
     currency: oldPrice.currency === null ? newPrice.currency : oldPrice.currency,
     commentCount: commentCount,
+    color: color,
     changes
   };
 };
 
-const initToolbar = (root, item, propertiesToCheck, stringToPrice, openComments) => {
-  const parameters = getElementParameters(item.history, item.commentCount, propertiesToCheck, stringToPrice);
+const initToolbar = (root, item, propertiesToCheck, stringToPrice, openComments, setColor) => {
+  const parameters = getElementParameters(item.history, item.commentCount, item.color, propertiesToCheck, stringToPrice);
 
   root.innerHTML = renderElement(parameters).trim();
 
   const element = root.firstElementChild;
-  const linkElements = element.getElementsByTagName('a');
-  const openButton = linkElements[0];
-  const closeButton = linkElements[linkElements.length - 2];
-  const commentsButton = linkElements[linkElements.length - 1];
+  const openButton = element.querySelector('.meerkat-changes-button');
+  const closeButton = element.querySelector('.meerkat-changes-close-button');
+  const commentsButton = element.querySelector('.meerkat-comments-button');
+  const colorsButton = element.querySelector('.meerkat-colors-button');
+  const colorsColorButtons = element.querySelectorAll('.meerkat-colors-color-button');
   const historyElement = openButton.nextElementSibling as HTMLElement;
 
   let isClosed = true;
@@ -333,8 +418,48 @@ const initToolbar = (root, item, propertiesToCheck, stringToPrice, openComments)
     }
   };
 
+  const colorsLeaveHandler = () => {
+    const colorsContainer = colorsButton.firstElementChild;
+
+    colorsButton.removeEventListener('mouseleave', colorsLeaveHandler);
+
+    colorsContainer.style.display = 'none';
+  };
+
+  const colorsHandler = (e) => {
+    const colorsContainer = colorsButton.firstElementChild;
+
+    colorsButton.addEventListener('mouseleave', colorsLeaveHandler);
+
+    colorsContainer.style.display = 'block';
+  };
+
+  const colorsColorClickHandler = (e) => {
+    colorsLeaveHandler();
+
+    const color = e.target.getAttribute('data-color-key');
+
+    setColor(item, color === 'default' ? null : color);
+
+    root.innerHTML = '';
+
+    if (color === 'default') {
+      delete item.color;
+    } else {
+      item.color = color;
+    }
+
+    initToolbar(root, item, propertiesToCheck, stringToPrice, openComments, setColor);
+  };
+
   openButton.addEventListener('click', toggleElement);
   closeButton.addEventListener('click', toggleElement);
+
+  colorsButton.addEventListener('mouseenter', colorsHandler);
+
+  for (const colorsColorButton of colorsColorButtons) {
+    colorsColorButton.addEventListener('click', colorsColorClickHandler);
+  }
 
   commentsButton.addEventListener('click', () => {
     openComments(item);

@@ -85,6 +85,17 @@ const openComments = (item) => {
   }, (response) => {});
 };
 
+const setColor = (item, color) => {
+  const state = item.history[item.history.length - 1];
+
+  chrome.runtime.sendMessage({
+    message: SERVICES.SET_COLOR,
+    namespace: NAMESPACE,
+    id: state[BASE_PROPERTIES.ID],
+    color: color
+  }, (response) => {});
+};
+
 const start = () => {
   const list = document.getElementsByClassName('list-items');
 
@@ -106,7 +117,7 @@ const start = () => {
 
         items[i].getElementsByClassName('contentArea')[0].appendChild(div);
 
-        getToolbar().initToolbar(div, response.items[i], propertiesToCheck, stringToPrice, openComments);
+        getToolbar().initToolbar(div, response.items[i], propertiesToCheck, stringToPrice, openComments, setColor);
       }
     });
   }
