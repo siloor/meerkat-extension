@@ -1,11 +1,7 @@
 import { BASE_PROPERTIES, SERVICES } from './constants';
 import { initAnalytics, sendEvent } from './analytics';
 import { storage } from './storage';
-
-declare global {
-  const __buildEnv__: string;
-  const __buildVersion__: string;
-}
+import config from './config';
 
 const getItemStorageKey = (namespace, id) => {
   return `item_${namespace}_${id}`;
@@ -264,7 +260,7 @@ migrate();
 
 initAnalytics();
 
-if (__buildEnv__ === 'production') {
+if (config.buildEnv === 'production') {
   chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason === 'install') {
       chrome.tabs.create({

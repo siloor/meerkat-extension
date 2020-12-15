@@ -1,5 +1,7 @@
+import config from './config';
+
 export const initAnalytics = () => {
-  if (__buildEnv__ !== 'production') {
+  if (config.buildEnv !== 'production') {
     return;
   }
 
@@ -12,11 +14,11 @@ export const initAnalytics = () => {
   window['ga']('create', 'UA-127764423-2', 'auto');
   window['ga']('set', 'checkProtocolTask', function(){}); // Removes failing protocol check. @see: http://stackoverflow.com/a/22152353/1958200
   window['ga']('require', 'displayfeatures');
-  window['ga']('send', 'pageview', `/background.html?version=${__buildVersion__}`); // Specify the virtual path
+  window['ga']('send', 'pageview', `/background.html?version=${config.buildVersion}`); // Specify the virtual path
 };
 
 export const sendEvent = (category, action, label) => {
-  if (__buildEnv__ !== 'production') {
+  if (config.buildEnv !== 'production') {
     return;
   }
 
