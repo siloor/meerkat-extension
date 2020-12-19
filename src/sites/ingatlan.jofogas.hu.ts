@@ -112,12 +112,14 @@ const start = () => {
       for (let i = 0; i < items.length; i++) {
         const div = document.createElement('div');
 
+        const shadow = div.attachShadow({ mode: 'closed' });
+
         div.style.position = 'absolute';
         div.style.bottom = '0px';
 
         items[i].getElementsByClassName('contentArea')[0].appendChild(div);
 
-        getToolbar().initToolbar(div, response.items[i], propertiesToCheck, stringToPrice, openComments, setColor);
+        getToolbar().initToolbar(shadow, response.items[i], propertiesToCheck, stringToPrice, openComments, setColor);
       }
     });
   }

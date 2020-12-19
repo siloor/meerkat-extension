@@ -172,7 +172,8 @@ const renderElement = ({
     },
     table: {
       tableLayout: 'fixed',
-      width: '100%'
+      width: '100%',
+      borderSpacing: '0'
     },
     tableHeaderType: {
       ...commonStyles.tableHeader,
@@ -307,6 +308,11 @@ const renderElement = ({
 
   return `
 <div>
+  <style>
+    a {
+      text-decoration: none;
+    }
+  </style>
   <div style="${styles.container}">
     <span style="${styles.logo}">M</span>
     <span style="${styles.date}" title="${translations.firstSaw}: ${timestampToString(creationDate)}">${days} ${translations.daysAgo}</span>
@@ -393,10 +399,6 @@ const initToolbar = (root, item, propertiesToCheck, stringToPrice, openComments,
   let isClosed = true;
 
   const documentClickHandler = (e) => {
-    if (element.contains(e.target)) {
-      return;
-    }
-
     toggleElement();
   };
 
@@ -463,6 +465,10 @@ const initToolbar = (root, item, propertiesToCheck, stringToPrice, openComments,
 
   commentsButton.addEventListener('click', () => {
     openComments(item);
+  });
+
+  root.addEventListener( 'mousedown', (e) => {
+    e.stopPropagation();
   });
 };
 

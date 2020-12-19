@@ -122,12 +122,14 @@ const start = () => {
       for (let i = 0; i < items.length; i++) {
         const div = document.createElement('div');
 
+        const shadow = div.attachShadow({ mode: 'closed' });
+
         div.style.float = 'left';
         div.style.width = '100%';
 
         items[i].appendChild(div);
 
-        getToolbar().initToolbar(div, response.items[i], propertiesToCheck, stringToPrice, openComments, setColor);
+        getToolbar().initToolbar(shadow, response.items[i], propertiesToCheck, stringToPrice, openComments, setColor);
       }
     });
   }
