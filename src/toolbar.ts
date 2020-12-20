@@ -66,22 +66,6 @@ const getTextDiff = (oldValue, value) => {
     .replace(/<del/g, '<del style="color: #ff4500;"');
 };
 
-const propertyToStyleRuleName = (name) => {
-  return name.replace(/[A-Z]/g, match => `-${match.toLowerCase()}`);
-};
-
-const generateStyles = (styles) => {
-  const result = { ...styles };
-
-  for (const key of Object.keys(result)) {
-    result[key] = Object.keys(result[key])
-      .map(prop => `${propertyToStyleRuleName(prop)}: ${result[key][prop]};`)
-      .join(' ');
-  }
-
-  return result;
-};
-
 const renderElement = ({
   creationDate,
   days,
@@ -91,143 +75,7 @@ const renderElement = ({
   color,
   changes
 }) => {
-  const commonStyles = {
-    tableHeader: {
-      padding: '8px',
-      position: 'sticky',
-      top: '0',
-      background: '#eee',
-      boxShadow: 'inset 0 -1px 0 #bbb',
-      fontSize: '14px',
-      color: '#999'
-    },
-    logo: {
-      display: 'inline-block',
-      width: '20px',
-      height: '20px',
-      lineHeight: '20px',
-      borderRadius: '10px',
-      textAlign: 'center',
-      fontSize: '14px',
-      fontWeight: 'bold',
-      backgroundColor: 'rgba(0, 0, 0, 0.15)',
-      color: '#fff'
-    }
-  };
-
   const theme = color && colors[color] ? colors[color] : colors.default;
-
-  const styles = generateStyles({
-    container: {
-      position: 'relative',
-      float: 'left',
-      background: theme.containerBackground,
-      borderRadius: '16px',
-      padding: '8px',
-      boxShadow: '0 1px 2px rgba(0,0,0,0.16), 0 1px 2px rgba(0,0,0,0.23)',
-      fontFamily: '\'Open Sans\', \'Helvetica Neue\', Helvetica, Arial, sans-serif',
-      fontSize: '12px'
-    },
-    logo: {
-      ...commonStyles.logo
-    },
-    date: {
-      marginLeft: '20px',
-      color: 'rgba(0, 0, 0, 0.4)'
-    },
-    priceDifference: {
-      marginLeft: '20px',
-      fontWeight: priceDifference === 0 || priceDifference === null ? 'normal' : 'bold',
-      color: priceDifference === 0 || priceDifference === null ? 'rgba(0, 0, 0, 0.4)' : (priceDifference > 0 ? '#ff4500' : '#39b54a')
-    },
-    changesButton: {
-      marginLeft: '20px',
-      color: changes.length > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'
-    },
-    changes: {
-      position: 'absolute',
-      zIndex: '1',
-      bottom: '0',
-      left: '0',
-      background: '#eee',
-      width: '0px',
-      height: '0px',
-      opacity: '0',
-      borderRadius: '16px',
-      overflow: 'hidden',
-      transition: 'width 0.2s, height 0.2s, opacity 0.2s',
-      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23)',
-      display: 'flex',
-      flexDirection: 'column'
-    },
-    tableContainer: {
-      padding: '10px 10px 0 10px',
-      overflow: 'auto',
-      flexGrow: '1'
-    },
-    tableContainerInner: {
-      width: '100%',
-      height: '100%',
-      overflow: 'auto'
-    },
-    table: {
-      tableLayout: 'fixed',
-      width: '100%',
-      borderSpacing: '0'
-    },
-    tableHeaderType: {
-      ...commonStyles.tableHeader,
-      width: '70px'
-    },
-    tableHeaderDate: {
-      ...commonStyles.tableHeader,
-      width: '90px'
-    },
-    tableHeaderValue: {
-      ...commonStyles.tableHeader,
-    },
-    tableCell: {
-      padding: '8px',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis'
-    },
-    changesCloseButton: {
-      ...commonStyles.logo,
-      margin: '8px'
-    },
-    commentsButton: {
-      marginLeft: '20px',
-      marginRight: '10px',
-      color: commentCount > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'
-    },
-    colorsButton: {
-      marginRight: '6px',
-      float: 'right',
-      width: '20px',
-      height: '20px',
-      boxShadow: '0 0 4px rgba(0, 0, 0, 0.4)',
-      borderRadius: '10px',
-      position: 'relative'
-    },
-    colorsContainer: {
-      display: 'none',
-      position: 'absolute',
-      bottom: '20px',
-      left: '0',
-      width: '168px',
-      height: '60px',
-      background: 'rgba(0, 0, 0, 0.4)',
-      borderRadius: '10px'
-    },
-    colorsContainerColor: {
-      display: 'inline-block',
-      width: '20px',
-      height: '20px',
-      boxShadow: '0 0 4px rgba(0, 0, 0, 0.4)',
-      borderRadius: '10px',
-      margin: '4px'
-    }
-  });
 
   const translations = getTranslations({
     en: {
@@ -291,9 +139,9 @@ const renderElement = ({
   for (const change of changes) {
     changesHTML.push(`
       <tr>
-        <td style="${styles.tableCell}">${change.property.title}</td>
-        <td style="${styles.tableCell}">${timestampToString(change.date)}</td>
-        <td style="${styles.tableCell}">${renderDiff(change.oldValue, change.value, change.property.type)}</td>
+        <td>${change.property.title}</td>
+        <td>${timestampToString(change.date)}</td>
+        <td>${renderDiff(change.oldValue, change.value, change.property.type)}</td>
       </tr>
     `);
   }
@@ -302,7 +150,7 @@ const renderElement = ({
 
   for (const colorKey of Object.keys(colors)) {
     colorsHTML.push(`
-      <a href="javascript:void(0);" style="${styles.colorsContainerColor} background-color: ${colors[colorKey].containerBackground}" title="${colorKey}" data-color-key="${colorKey}" class="meerkat-colors-color-button"></a>
+      <a href="javascript:void(0);" class="colors-color-button" style="background-color: ${colors[colorKey].containerBackground}" title="${colorKey}" data-color-key="${colorKey}"></a>
     `);
   }
 
@@ -312,20 +160,146 @@ const renderElement = ({
     a {
       text-decoration: none;
     }
+
+    .container {
+      position: relative;
+      float: left;
+      border-radius: 16px;
+      padding: 8px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);
+      font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 12px;
+    }
+
+    .logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: bold;
+      background-color: rgba(0, 0, 0, 0.15);
+      color: #fff;
+    }
+
+    .changes-close-button {
+      margin: 8px;
+    }
+
+    .date {
+      margin-left: 20px;
+      color: rgba(0, 0, 0, 0.4);
+    }
+
+    .price-difference {
+      margin-left: 20px;
+    }
+
+    .changes-button {
+      margin-left: 20px;
+    }
+
+    .changes {
+      position: absolute;
+      z-index: 1;
+      bottom: 0;
+      left: 0;
+      background: #eee;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: width 0.2s, height 0.2s, opacity 0.2s;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .table-container {
+      padding: 10px 10px 0 10px;
+      overflow: auto;
+      flex-grow: 1;
+    }
+
+    .table-container-inner {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+    }
+
+    .table {
+      table-layout: fixed;
+      width: 100%;
+      border-spacing: 0;
+    }
+
+    .table th {
+      padding: 8px;
+      position: sticky;
+      top: 0;
+      background: #eee;
+      box-shadow: inset 0 -1px 0 #bbb;
+      font-size: 14px;
+      color: #999;
+    }
+
+    .table td {
+      padding: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .comments-button {
+      margin-left: 20px;
+      margin-right: 10px;
+    }
+
+    .colors-button {
+      margin-right: 6px;
+      float: right;
+      width: 20px;
+      height: 20px;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+      border-radius: 10px;
+      position: relative;
+    }
+
+    .colors-container {
+      display: none;
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      width: 168px;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 10px;
+    }
+
+    .colors-color-button {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+      border-radius: 10px;
+      margin: 4px;
+    }
   </style>
-  <div style="${styles.container}">
-    <span style="${styles.logo}">M</span>
-    <span style="${styles.date}" title="${translations.firstSaw}: ${timestampToString(creationDate)}">${days} ${translations.daysAgo}</span>
-    <span style="${styles.priceDifference}" title="${translations.priceChange}">${priceDifference > 0 ? '+' : ''}${numberToString(priceDifference)}${currency === null ? '' : ` ${currency}`}</span>
-    <a style="${styles.changesButton}" href="javascript:void(0);" class="meerkat-changes-button">${translations.changes} (${changes.length})</a>
-    <div style="${styles.changes}">
-      <div style="${styles.tableContainer}">
-        <div style="${styles.tableContainerInner}">
-          <table style="${styles.table}">
+  <div class="container" style="background-color: ${theme.containerBackground}">
+    <span class="logo">M</span>
+    <span class="date" title="${translations.firstSaw}: ${timestampToString(creationDate)}">${days} ${translations.daysAgo}</span>
+    <span class="price-difference" style="font-weight: ${priceDifference === 0 || priceDifference === null ? 'normal' : 'bold'}; color: ${priceDifference === 0 || priceDifference === null ? 'rgba(0, 0, 0, 0.4)' : (priceDifference > 0 ? '#ff4500' : '#39b54a')};" title="${translations.priceChange}">${priceDifference > 0 ? '+' : ''}${numberToString(priceDifference)}${currency === null ? '' : ` ${currency}`}</span>
+    <a class="changes-button" style="color: ${changes.length > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translations.changes} (${changes.length})</a>
+    <div class="changes">
+      <div class="table-container">
+        <div class="table-container-inner">
+          <table class="table">
             <thead>
-              <th style="${styles.tableHeaderType}">${translations.changesLabelType}</th>
-              <th style="${styles.tableHeaderDate}">${translations.changesLabelDate}</th>
-              <th style="${styles.tableHeaderValue}">${translations.changesLabelValue}</th>
+              <th style="width: 70px;">${translations.changesLabelType}</th>
+              <th style="width: 90px;">${translations.changesLabelDate}</th>
+              <th>${translations.changesLabelValue}</th>
             </thead>
             <tbody>
               ${changesHTML.map(html => html.trim()).join('')}
@@ -334,12 +308,12 @@ const renderElement = ({
         </div>
       </div>
       <div>
-        <a href="javascript:void(0);" style="${styles.changesCloseButton}" class="meerkat-changes-close-button">X</a>
+        <a href="javascript:void(0);" class="logo changes-close-button">X</a>
       </div>
     </div>
-    <a style="${styles.commentsButton}" href="javascript:void(0);" class="meerkat-comments-button">${translations.comments} (${commentCount})</a>
-    <div style="${styles.colorsButton}" href="javascript:void(0);" class="meerkat-colors-button">
-      <div style="${styles.colorsContainer}">
+    <a class="comments-button" style="color: ${commentCount > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translations.comments} (${commentCount})</a>
+    <div class="colors-button" href="javascript:void(0);">
+      <div class="colors-container">
         ${colorsHTML.map(html => html.trim()).join('')}
       </div>
     </div>
@@ -389,11 +363,11 @@ const initToolbar = (root, item, propertiesToCheck, stringToPrice, openComments,
   root.innerHTML = renderElement(parameters).trim();
 
   const element = root.firstElementChild;
-  const openButton = element.querySelector('.meerkat-changes-button');
-  const closeButton = element.querySelector('.meerkat-changes-close-button');
-  const commentsButton = element.querySelector('.meerkat-comments-button');
-  const colorsButton = element.querySelector('.meerkat-colors-button');
-  const colorsColorButtons = element.querySelectorAll('.meerkat-colors-color-button');
+  const openButton = element.querySelector('.changes-button');
+  const closeButton = element.querySelector('.changes-close-button');
+  const commentsButton = element.querySelector('.comments-button');
+  const colorsButton = element.querySelector('.colors-button');
+  const colorsColorButtons = element.querySelectorAll('.colors-color-button');
   const historyElement = openButton.nextElementSibling as HTMLElement;
 
   let isClosed = true;
