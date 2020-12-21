@@ -31,37 +31,40 @@ const getIsNewState = (lastSavedItem, item, propertiesToCheck) => {
   return false;
 };
 
-const getCommentsCount = (namespace, ids, cb) => {
-  const idsParam = ids.map(id => `&thread[]=ident:/${getDisqusIdentifier(namespace, id)}`).join('');
-  const apiKey = 'E8Uh5l5fHZ6gD8U3KycjAIAk46f68Zw7C6eW8WSjZvCLXebZ7p0r1yrYDrLilk2F';
-  const xhr = new XMLHttpRequest();
-  xhr.open("GET", `https://disqus.com/api/3.0/threads/set.json?forum=meerkat-for-a-transparent-market&api_key=${apiKey}${idsParam}`, true);
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState == 4) {
-      let threads = [];
+const getCommentsCount = async (namespace, ids) => {
+  const params = new URLSearchParams();
 
-      try {
-        threads = JSON.parse(xhr.responseText).response;
-      } catch(e) { }
+  params.append('forum', 'meerkat-for-a-transparent-market');
+  params.append('api_key', 'E8Uh5l5fHZ6gD8U3KycjAIAk46f68Zw7C6eW8WSjZvCLXebZ7p0r1yrYDrLilk2F');
 
-      const countMap = {};
+  for (const id of ids) {
+    params.append('thread[]', `ident:/${getDisqusIdentifier(namespace, id)}`);
+  }
 
-      for (const thread of threads) {
-        const id = thread.identifiers[0].replace(/^\//, '').replace(`${namespace}_`, '');
+  let threads = [];
 
-        countMap[id] = thread.posts;
-      }
+  try {
+    const response = await fetch(`https://disqus.com/api/3.0/threads/set.json?${params}`);
+    const data = await response.json();
 
-      const result = {};
+    threads = data.response;
+  } catch(e) { }
 
-      for (const id of ids) {
-        result[id] = countMap[id] ? countMap[id] : 0;
-      }
+  const countMap = {};
 
-      cb(result);
-    }
-  };
-  xhr.send();
+  for (const thread of threads) {
+    const id = thread.identifiers[0].replace(/^\//, '').replace(`${namespace}_`, '');
+
+    countMap[id] = thread.posts;
+  }
+
+  const result = {};
+
+  for (const id of ids) {
+    result[id] = countMap[id] ? countMap[id] : 0;
+  }
+
+  return result;
 };
 
 const getStoreVersion = async () => {
@@ -143,19 +146,18 @@ const getList = async (sendResponse, namespace, propertiesToCheck, version, item
     return aIndex > bIndex ? 1 : -1;
   });
 
-  getCommentsCount(
+  const commentCountMap = await getCommentsCount(
     namespace,
-    newItems.map(item => item.history[0][BASE_PROPERTIES.ID]),
-    (commentCountMap) => {
-      const itemObjects = newItems.map(item => ({
-        history: item.history,
-        color: item.color,
-        commentCount: commentCountMap[item.history[0][BASE_PROPERTIES.ID]]
-      }));
-
-      sendResponse({ items: itemObjects });
-    }
+    newItems.map(item => item.history[0][BASE_PROPERTIES.ID])
   );
+
+  const itemObjects = newItems.map(item => ({
+    history: item.history,
+    color: item.color,
+    commentCount: commentCountMap[item.history[0][BASE_PROPERTIES.ID]]
+  }));
+
+  sendResponse({ items: itemObjects });
 };
 
 const getNamespacesInfo = async (sendResponse) => {
