@@ -322,7 +322,7 @@ const renderElement = ({
 `;
 };
 
-const getElementParameters = (history, commentCount, color, propertiesToCheck, stringToPrice) => {
+const getElementParameters = (history, commentCount, color, currentDatetime, propertiesToCheck, stringToPrice) => {
   const oldPrice = stringToPrice(history[0].price);
   const newPrice = stringToPrice(history[history.length - 1].price);
 
@@ -348,7 +348,7 @@ const getElementParameters = (history, commentCount, color, propertiesToCheck, s
 
   return {
     creationDate: history[0][BASE_PROPERTIES.CREATED_TIMESTAMP],
-    days: Math.round(((new Date()).getTime() - history[0][BASE_PROPERTIES.CREATED_TIMESTAMP]) / (1000 * 60 * 60 * 24)),
+    days: Math.round(((new Date(currentDatetime)).getTime() - history[0][BASE_PROPERTIES.CREATED_TIMESTAMP]) / (1000 * 60 * 60 * 24)),
     priceDifference: oldPrice.value === null && newPrice.value === null ? null : newPrice.value - oldPrice.value,
     currency: oldPrice.currency === null ? newPrice.currency : oldPrice.currency,
     commentCount: commentCount,
@@ -357,8 +357,8 @@ const getElementParameters = (history, commentCount, color, propertiesToCheck, s
   };
 };
 
-const initToolbar = (root, item, propertiesToCheck, stringToPrice, openComments, setColor) => {
-  const parameters = getElementParameters(item.history, item.commentCount, item.color, propertiesToCheck, stringToPrice);
+const initToolbar = (root, item, currentDatetime, propertiesToCheck, stringToPrice, openComments, setColor) => {
+  const parameters = getElementParameters(item.history, item.commentCount, item.color, currentDatetime, propertiesToCheck, stringToPrice);
 
   root.innerHTML = renderElement(parameters).trim();
 
@@ -425,7 +425,7 @@ const initToolbar = (root, item, propertiesToCheck, stringToPrice, openComments,
       item.color = color;
     }
 
-    initToolbar(root, item, propertiesToCheck, stringToPrice, openComments, setColor);
+    initToolbar(root, item, currentDatetime, propertiesToCheck, stringToPrice, openComments, setColor);
   };
 
   openButton.addEventListener('click', toggleElement);

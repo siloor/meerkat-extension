@@ -128,7 +128,7 @@ const start = () => {
 
         items[i].appendChild(div);
 
-        getToolbar().initToolbar(shadow, response.items[i], propertiesToCheck, stringToPrice, openComments, setColor);
+        getToolbar().initToolbar(shadow, response.items[i], response.currentDatetime, propertiesToCheck, stringToPrice, openComments, setColor);
       }
     });
   }

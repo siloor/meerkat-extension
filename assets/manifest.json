@@ -34,7 +34,8 @@
   "permissions": [
     "storage",
     "unlimitedStorage",
-    "https://disqus.com/"
+    "https://disqus.com/",
+    "https://siloor.com/"
   ],
   "content_security_policy": "script-src 'self' https://www.google-analytics.com; object-src 'self'"
 }

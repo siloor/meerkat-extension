@@ -67,6 +67,17 @@ const getCommentsCount = async (namespace, ids) => {
   return result;
 };
 
+const getCurrentDatetime = async () => {
+  try {
+    const response = await fetch('https://siloor.com/meerkat/api/current_datetime');
+    const data = await response.json();
+
+    return new Date(data.data.current_datetime);
+  } catch(e) { }
+
+  return null;
+};
+
 const getStoreVersion = async () => {
   const result = await storage.get('version');
 
@@ -101,7 +112,10 @@ const migrate = async () => {
   }
 };
 
-const getList = async (sendResponse, namespace, propertiesToCheck, version, items, timestamp) => {
+const getList = async (sendResponse, namespace, propertiesToCheck, version, items) => {
+  const currentDatetime = await getCurrentDatetime();
+  const timestamp = currentDatetime.getTime();
+
   const originalOrder = items.map(item => item[BASE_PROPERTIES.ID]);
 
   const savedItems = await storage.get(items.map(item => getItemStorageKey(namespace, item[BASE_PROPERTIES.ID])));
@@ -157,7 +171,10 @@ const getList = async (sendResponse, namespace, propertiesToCheck, version, item
     commentCount: commentCountMap[item.history[0][BASE_PROPERTIES.ID]]
   }));
 
-  sendResponse({ items: itemObjects });
+  sendResponse({
+    items: itemObjects,
+    currentDatetime: currentDatetime
+  });
 };
 
 const getNamespacesInfo = async (sendResponse) => {
@@ -237,7 +254,7 @@ chrome.runtime.onMessage.addListener(
     if (request.message === SERVICES.GET_LIST) {
       sendEvent('extension', 'getList', request.namespace);
 
-      getList(sendResponse, request.namespace, request.propertiesToCheck, request.version, request.items, (new Date()).getTime());
+      getList(sendResponse, request.namespace, request.propertiesToCheck, request.version, request.items);
 
       return true;
     } else if (request.message === SERVICES.GET_NAMESPACES_INFO) {
