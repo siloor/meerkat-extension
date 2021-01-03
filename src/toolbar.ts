@@ -72,11 +72,8 @@ const renderElement = ({
   priceDifference,
   currency,
   commentCount,
-  color,
   changes
 }) => {
-  const theme = color && colors[color] ? colors[color] : colors.default;
-
   const translations = getTranslations({
     en: {
       firstSaw: 'First saw',
@@ -169,6 +166,7 @@ const renderElement = ({
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);
       font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 12px;
+      background-color: var(--meerkat-container-background);
     }
 
     .logo {
@@ -287,7 +285,7 @@ const renderElement = ({
       margin: 4px;
     }
   </style>
-  <div class="container" style="background-color: ${theme.containerBackground}">
+  <div class="container">
     <span class="logo">M</span>
     <span class="date" title="${translations.firstSaw}: ${timestampToString(creationDate)}">${days} ${translations.daysAgo}</span>
     <span class="price-difference" style="font-weight: ${priceDifference === 0 || priceDifference === null ? 'normal' : 'bold'}; color: ${priceDifference === 0 || priceDifference === null ? 'rgba(0, 0, 0, 0.4)' : (priceDifference > 0 ? '#ff4500' : '#39b54a')};" title="${translations.priceChange}">${priceDifference > 0 ? '+' : ''}${numberToString(priceDifference)}${currency === null ? '' : ` ${currency}`}</span>
@@ -322,7 +320,7 @@ const renderElement = ({
 `;
 };
 
-const getElementParameters = (history, commentCount, color, currentDatetime, propertiesToCheck, stringToPrice) => {
+const getElementParameters = (history, commentCount, currentDatetime, propertiesToCheck, stringToPrice) => {
   const oldPrice = stringToPrice(history[0].price);
   const newPrice = stringToPrice(history[history.length - 1].price);
 
@@ -352,15 +350,22 @@ const getElementParameters = (history, commentCount, color, currentDatetime, pro
     priceDifference: oldPrice.value === null && newPrice.value === null ? null : newPrice.value - oldPrice.value,
     currency: oldPrice.currency === null ? newPrice.currency : oldPrice.currency,
     commentCount: commentCount,
-    color: color,
     changes
   };
 };
 
+const setColorTheme = (root, color) => {
+  const theme = color && colors[color] ? colors[color] : colors.default;
+
+  root.firstElementChild.style.setProperty('--meerkat-container-background', theme.containerBackground);
+};
+
 const initToolbar = (root, item, currentDatetime, propertiesToCheck, stringToPrice, openComments, setColor) => {
-  const parameters = getElementParameters(item.history, item.commentCount, item.color, currentDatetime, propertiesToCheck, stringToPrice);
+  const parameters = getElementParameters(item.history, item.commentCount, currentDatetime, propertiesToCheck, stringToPrice);
 
   root.innerHTML = renderElement(parameters).trim();
+
+  setColorTheme(root, item.color);
 
   const element = root.firstElementChild;
   const openButton = element.querySelector('.changes-button');
@@ -417,15 +422,13 @@ const initToolbar = (root, item, currentDatetime, propertiesToCheck, stringToPri
 
     setColor(item, color === 'default' ? null : color);
 
-    root.innerHTML = '';
-
     if (color === 'default') {
       delete item.color;
     } else {
       item.color = color;
     }
 
-    initToolbar(root, item, currentDatetime, propertiesToCheck, stringToPrice, openComments, setColor);
+    setColorTheme(root, item.color);
   };
 
   openButton.addEventListener('click', toggleElement);

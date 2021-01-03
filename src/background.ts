@@ -3,6 +3,8 @@ import { initAnalytics, sendEvent } from './analytics';
 import { storage } from './storage';
 import config from './config';
 
+let token = null;
+
 const getItemStorageKey = (namespace, id) => {
   return `item_${namespace}_${id}`;
 };
@@ -67,9 +69,18 @@ const getCommentsCount = async (namespace, ids) => {
   return result;
 };
 
-const getCurrentDatetime = async () => {
+const getCurrentDatetime = async (token, namespace, items) => {
+  const params = new URLSearchParams();
+
+  params.append('token', token);
+  params.append('namespace', namespace);
+
+  for (const item of items) {
+    params.append('items[]', item[BASE_PROPERTIES.ID]);
+  }
+
   try {
-    const response = await fetch('https://siloor.com/meerkat/api/current_datetime');
+    const response = await fetch(`https://siloor.com/meerkat/api/list?${params}`);
     const data = await response.json();
 
     return new Date(data.data.current_datetime);
@@ -102,6 +113,29 @@ const migrate1to2 = async () => {
   await storage.set(newItems);
 };
 
+const generateRandomString = (length) => {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+
+  return result;
+};
+
+const setToken = async () => {
+  const result = await storage.get('token');
+
+  if (result.token) {
+    token = result.token;
+  } else {
+    token = generateRandomString(40);
+
+    await storage.set({ token: token });
+  }
+};
+
 const migrate = async () => {
   const version = await getStoreVersion();
 
@@ -112,8 +146,8 @@ const migrate = async () => {
   }
 };
 
-const getList = async (sendResponse, namespace, propertiesToCheck, version, items) => {
-  const currentDatetime = await getCurrentDatetime();
+const getList = async (sendResponse, token, namespace, propertiesToCheck, version, items) => {
+  const currentDatetime = await getCurrentDatetime(token, namespace, items);
   const timestamp = currentDatetime.getTime();
 
   const originalOrder = items.map(item => item[BASE_PROPERTIES.ID]);
@@ -254,7 +288,7 @@ chrome.runtime.onMessage.addListener(
     if (request.message === SERVICES.GET_LIST) {
       sendEvent('extension', 'getList', request.namespace);
 
-      getList(sendResponse, request.namespace, request.propertiesToCheck, request.version, request.items);
+      getList(sendResponse, token, request.namespace, request.propertiesToCheck, request.version, request.items);
 
       return true;
     } else if (request.message === SERVICES.GET_NAMESPACES_INFO) {
@@ -295,6 +329,8 @@ chrome.runtime.onMessage.addListener(
     }
   }
 );
+
+setToken();
 
 migrate();
 
