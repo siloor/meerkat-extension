@@ -10,7 +10,10 @@ export const SERVICES = {
   GET_NAMESPACES_INFO: 'get_namespaces_info',
   CLEAR_NAMESPACE: 'clear_namespace',
   OPEN_COMMENTS: 'open_comments',
-  SET_COLOR: 'set_color'
+  SET_COLOR: 'set_color',
+  ADD_FLAG: 'add_flag',
+  REMOVE_FLAG: 'remove_flag',
+  GET_FLAGS: 'get_flags'
 };
 
 export const PROPERTY_TYPES = {

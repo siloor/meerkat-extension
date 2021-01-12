@@ -37,10 +37,47 @@ const colors = {
   brown: {
     containerBackground: '#e6c9a8'
   },
-  gray: {
-    containerBackground: '#e8eaed'
+  white: {
+    containerBackground: '#fff'
   }
 };
+
+const translationsToolbar = getTranslations({
+  en: {
+    firstSaw: 'First saw',
+    daysAgo: 'days ago',
+    priceChange: 'Price change',
+    changes: 'Changes',
+    changesLabelType: 'Type',
+    changesLabelDate: 'Date',
+    changesLabelValue: 'Value',
+    comments: 'Comments',
+    oldUrl: 'Old link',
+    newUrl: 'New link',
+    oldImage: 'Old image',
+    newImage: 'New image',
+    flags: 'Flags',
+    flagAdd: 'Add',
+    flagsEmptyText: 'There are no added flags yet. Be the first and add one!'
+  },
+  hu: {
+    firstSaw: 'Első megtekintés',
+    daysAgo: 'napja',
+    priceChange: 'Árváltozás',
+    changes: 'Változások',
+    changesLabelType: 'Típus',
+    changesLabelDate: 'Dátum',
+    changesLabelValue: 'Érték',
+    comments: 'Hozzászólások',
+    oldUrl: 'Régi link',
+    newUrl: 'Új link',
+    oldImage: 'Régi kép',
+    newImage: 'Új kép',
+    flags: 'Flag-ek',
+    flagAdd: 'Hozzáadás',
+    flagsEmptyText: 'Nincs még hozzáadott flag. Legyél te az első és adj hozzá egyet!'
+  }
+});
 
 const timestampToString = (timestamp) => {
   const date = new Date(timestamp);
@@ -72,59 +109,29 @@ const renderElement = ({
   priceDifference,
   currency,
   commentCount,
+  flags,
   changes
 }) => {
-  const translations = getTranslations({
-    en: {
-      firstSaw: 'First saw',
-      daysAgo: 'days ago',
-      priceChange: 'Price change',
-      changes: 'Changes',
-      changesLabelType: 'Type',
-      changesLabelDate: 'Date',
-      changesLabelValue: 'Value',
-      comments: 'Comments',
-      oldUrl: 'Old link',
-      newUrl: 'New link',
-      oldImage: 'Old image',
-      newImage: 'New image'
-    },
-    hu: {
-      firstSaw: 'Első megtekintés',
-      daysAgo: 'napja',
-      priceChange: 'Árváltozás',
-      changes: 'Változások',
-      changesLabelType: 'Típus',
-      changesLabelDate: 'Dátum',
-      changesLabelValue: 'Érték',
-      comments: 'Hozzászólások',
-      oldUrl: 'Régi link',
-      newUrl: 'Új link',
-      oldImage: 'Régi kép',
-      newImage: 'Új kép'
-    }
-  });
-
   const renderDiff = (oldValue, value, type) => {
     if (type === PROPERTY_TYPES.TEXT) {
       return getTextDiff(oldValue, value);
     } else if (type === PROPERTY_TYPES.URL) {
       return [
         oldValue
-          ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldUrl}</a>`
-          : `<span style="text-decoration: line-through;">${translations.oldUrl}</span>`,
+          ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translationsToolbar.oldUrl}</a>`
+          : `<span style="text-decoration: line-through;">${translationsToolbar.oldUrl}</span>`,
         value
-          ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newUrl}</a>`
-          : `<span style="text-decoration: line-through;">${translations.newUrl}</span>`
+          ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translationsToolbar.newUrl}</a>`
+          : `<span style="text-decoration: line-through;">${translationsToolbar.newUrl}</span>`
       ].join(' - ');
     } else if (type === PROPERTY_TYPES.IMAGE) {
       return [
         oldValue
-          ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldImage}</a>`
-          : `<span style="text-decoration: line-through;">${translations.oldImage}</span>`,
+          ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translationsToolbar.oldImage}</a>`
+          : `<span style="text-decoration: line-through;">${translationsToolbar.oldImage}</span>`,
         value
-          ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newImage}</a>`
-          : `<span style="text-decoration: line-through;">${translations.newImage}</span>`
+          ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translationsToolbar.newImage}</a>`
+          : `<span style="text-decoration: line-through;">${translationsToolbar.newImage}</span>`
       ].join(' - ');
     }
 
@@ -164,8 +171,9 @@ const renderElement = ({
       border-radius: 16px;
       padding: 8px;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);
-      font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 12px;
+      font-family: 'Roboto', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      line-height: 17px;
       background-color: var(--meerkat-container-background);
     }
 
@@ -176,27 +184,27 @@ const renderElement = ({
       line-height: 20px;
       border-radius: 10px;
       text-align: center;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: bold;
       background-color: rgba(0, 0, 0, 0.15);
       color: #fff;
     }
 
-    .changes-close-button {
-      margin: 8px;
-    }
-
     .date {
-      margin-left: 20px;
+      margin-left: 16px;
       color: rgba(0, 0, 0, 0.4);
     }
 
     .price-difference {
-      margin-left: 20px;
+      margin-left: 16px;
     }
 
     .changes-button {
-      margin-left: 20px;
+      margin-left: 16px;
+    }
+
+    .changes-close-button {
+      margin: 8px;
     }
 
     .changes {
@@ -216,25 +224,25 @@ const renderElement = ({
       flex-direction: column;
     }
 
-    .table-container {
+    .changes-container {
       padding: 10px 10px 0 10px;
       overflow: auto;
       flex-grow: 1;
     }
 
-    .table-container-inner {
+    .changes-container-inner {
       width: 100%;
       height: 100%;
       overflow: auto;
     }
 
-    .table {
+    .changes table {
       table-layout: fixed;
       width: 100%;
       border-spacing: 0;
     }
 
-    .table th {
+    .changes table th {
       padding: 8px;
       position: sticky;
       top: 0;
@@ -244,18 +252,160 @@ const renderElement = ({
       color: #999;
     }
 
-    .table td {
+    .changes table td {
       padding: 8px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
+    .flags-button {
+      margin-left: 16px;
+    }
+
+    .flags-button span {
+      background-color: #fff;
+      padding: 2px 5px;
+      border-radius: 10px;
+      margin-left: 3px;
+    }
+
+    .flags-close-button {
+      margin: 8px;
+    }
+
+    .flags {
+      position: absolute;
+      z-index: 1;
+      bottom: 0;
+      left: 0;
+      background: #eee;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: width 0.2s, height 0.2s, opacity 0.2s;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .flags-header {
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    .flags-container {
+      padding: 10px 10px 0 10px;
+      overflow: auto;
+      flex-grow: 1;
+    }
+
+    .flags-container-inner {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+    }
+
+    .flags-empty-text {
+      margin: 0;
+    }
+
+    .flags ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .flags ul li {
+      position: relative;
+      display: block;
+      float: left;
+      background-color: rgba(255, 255, 255, 0.75);
+      padding: 6px 10px;
+      margin: 3px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .flags ul li span {
+      display: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 30px;
+      height: 29px;
+      line-height: 29px;
+      text-align: center;
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+      font-size: 21px;
+      background-color: #555;
+      color: #fff;
+    }
+
+    .flags ul li span:before {
+      content: "+";
+    }
+
+    .flags ul li:hover span {
+      display: block;
+    }
+
+    .flags ul li.flagged {
+      background-color: rgba(0, 0, 0, 0.5);
+      color: #fff;
+    }
+
+    .flags ul li.flagged span:before {
+      content: "-";
+    }
+
+    .flags-add-form {
+      float: right;
+    }
+
+    .flags-add-form input {
+      display: block;
+      float: left;
+      margin: 5px;
+      width: 200px;
+      padding: 4px;
+      height: 16px;
+      border: 1px solid #999;
+      border-radius: 4px;
+    }
+
+    .flags-add-form input:focus {
+      outline: 0;
+      border: 2px solid #000;
+      padding: 3px;
+    }
+
+    .flags-add-form button {
+      margin: 5px 20px 5px 0;
+      width: 100px;
+      box-sizing: content-box;
+      padding: 4px;
+      height: 16px;
+      border: 1px solid #999;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    .flags-add-form button:focus {
+      outline: 0;
+      border: 2px solid #000;
+      padding: 3px;
+    }
+
     .comments-button {
-      margin-left: 20px;
-      margin-right: 10px;
+      margin-left: 16px;
     }
 
     .colors-button {
+      margin-left: 16px;
       margin-right: 6px;
       float: right;
       width: 20px;
@@ -287,17 +437,17 @@ const renderElement = ({
   </style>
   <div class="container">
     <span class="logo">M</span>
-    <span class="date" title="${translations.firstSaw}: ${timestampToString(creationDate)}">${days} ${translations.daysAgo}</span>
-    <span class="price-difference" style="font-weight: ${priceDifference === 0 || priceDifference === null ? 'normal' : 'bold'}; color: ${priceDifference === 0 || priceDifference === null ? 'rgba(0, 0, 0, 0.4)' : (priceDifference > 0 ? '#ff4500' : '#39b54a')};" title="${translations.priceChange}">${priceDifference > 0 ? '+' : ''}${numberToString(priceDifference)}${currency === null ? '' : ` ${currency}`}</span>
-    <a class="changes-button" style="color: ${changes.length > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translations.changes} (${changes.length})</a>
+    <span class="date" title="${translationsToolbar.firstSaw}: ${timestampToString(creationDate)}">${days} ${translationsToolbar.daysAgo}</span>
+    <span class="price-difference" style="font-weight: ${priceDifference === 0 || priceDifference === null ? 'normal' : 'bold'}; color: ${priceDifference === 0 || priceDifference === null ? 'rgba(0, 0, 0, 0.4)' : (priceDifference > 0 ? '#ff4500' : '#39b54a')};" title="${translationsToolbar.priceChange}">${priceDifference > 0 ? '+' : ''}${numberToString(priceDifference)}${currency === null ? '' : ` ${currency}`}</span>
+    <a class="changes-button" style="color: ${changes.length > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translationsToolbar.changes} (${changes.length})</a>
     <div class="changes">
-      <div class="table-container">
-        <div class="table-container-inner">
-          <table class="table">
+      <div class="changes-container">
+        <div class="changes-container-inner">
+          <table>
             <thead>
-              <th style="width: 70px;">${translations.changesLabelType}</th>
-              <th style="width: 90px;">${translations.changesLabelDate}</th>
-              <th>${translations.changesLabelValue}</th>
+              <th style="width: 70px;">${translationsToolbar.changesLabelType}</th>
+              <th style="width: 90px;">${translationsToolbar.changesLabelDate}</th>
+              <th>${translationsToolbar.changesLabelValue}</th>
             </thead>
             <tbody>
               ${changesHTML.map(html => html.trim()).join('')}
@@ -309,7 +459,23 @@ const renderElement = ({
         <a href="javascript:void(0);" class="logo changes-close-button">X</a>
       </div>
     </div>
-    <a class="comments-button" style="color: ${commentCount > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translations.comments} (${commentCount})</a>
+    <a class="flags-button" style="color: ${true ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translationsToolbar.flags} (${flags.count})${flags.top ? ` <span>${flags.top.title}</span>` : ''}</a>
+    <div class="flags">
+      <div class="flags-header">${translationsToolbar.flags}</div>
+      <div class="flags-container">
+        <div class="flags-container-inner">
+          <ul></ul>
+        </div>
+      </div>
+      <div>
+        <a href="javascript:void(0);" class="logo flags-close-button">X</a>
+        <form class="flags-add-form">
+          <input type="text" name="title" />
+          <button>${translationsToolbar.flagAdd}</button>
+        </form>
+      </div>
+    </div>
+    <a class="comments-button" style="color: ${commentCount > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'}; display: none;" href="javascript:void(0);">${translationsToolbar.comments} (${commentCount})</a>
     <div class="colors-button" href="javascript:void(0);">
       <div class="colors-container">
         ${colorsHTML.map(html => html.trim()).join('')}
@@ -320,7 +486,38 @@ const renderElement = ({
 `;
 };
 
-const getElementParameters = (history, commentCount, currentDatetime, propertiesToCheck, stringToPrice) => {
+const renderFlags = async (getFlags, addFlag, removeFlag, item, flagsContainer) => {
+  const flags = await getFlags(item);
+
+  if (flags.length) {
+    flagsContainer.querySelector('.flags-container-inner').innerHTML = `<ul>${
+      flags
+        .map(flag => `<li class="${flag.flagged ? 'flagged' : ''}" data-title="${flag.title}">${flag.title} (${flag.count})<span></span></li>`)
+        .join('')
+    }</ul>`;
+  } else {
+    flagsContainer.querySelector('.flags-container-inner').innerHTML = `<p class="flags-empty-text">${translationsToolbar.flagsEmptyText}</p>`;
+  }
+
+  const flagButtons = flagsContainer.querySelectorAll('li');
+
+  for (const flagButton of flagButtons) {
+    flagButton.addEventListener('click', async (e) => {
+      const flagged = e.currentTarget.classList.contains('flagged');
+      const title = e.currentTarget.getAttribute('data-title');
+
+      if (flagged) {
+        await removeFlag(item, title);
+      } else {
+        await addFlag(item, title);
+      }
+
+      await renderFlags(getFlags, addFlag, removeFlag, item, flagsContainer);
+    });
+  }
+};
+
+const getElementParameters = (history, commentCount, flags, currentDatetime, propertiesToCheck, stringToPrice) => {
   const oldPrice = stringToPrice(history[0].price);
   const newPrice = stringToPrice(history[history.length - 1].price);
 
@@ -350,6 +547,7 @@ const getElementParameters = (history, commentCount, currentDatetime, properties
     priceDifference: oldPrice.value === null && newPrice.value === null ? null : newPrice.value - oldPrice.value,
     currency: oldPrice.currency === null ? newPrice.currency : oldPrice.currency,
     commentCount: commentCount,
+    flags: flags,
     changes
   };
 };
@@ -360,42 +558,81 @@ const setColorTheme = (root, color) => {
   root.firstElementChild.style.setProperty('--meerkat-container-background', theme.containerBackground);
 };
 
-const initToolbar = (root, item, currentDatetime, propertiesToCheck, stringToPrice, openComments, setColor) => {
-  const parameters = getElementParameters(item.history, item.commentCount, currentDatetime, propertiesToCheck, stringToPrice);
+const initToolbar = (
+  root,
+  item,
+  currentDatetime,
+  propertiesToCheck,
+  stringToPrice,
+  openComments,
+  setColor,
+  addFlag,
+  removeFlag,
+  getFlags
+) => {
+  const parameters = getElementParameters(item.history, item.commentCount, item.flags, currentDatetime, propertiesToCheck, stringToPrice);
 
   root.innerHTML = renderElement(parameters).trim();
 
   setColorTheme(root, item.color);
 
   const element = root.firstElementChild;
-  const openButton = element.querySelector('.changes-button');
-  const closeButton = element.querySelector('.changes-close-button');
+  const changesOpenButton = element.querySelector('.changes-button');
+  const changesCloseButton = element.querySelector('.changes-close-button');
+  const changes = element.querySelector('.changes');
+  const flagsOpenButton = element.querySelector('.flags-button');
+  const flagsCloseButton = element.querySelector('.flags-close-button');
+  const flags = element.querySelector('.flags');
   const commentsButton = element.querySelector('.comments-button');
   const colorsButton = element.querySelector('.colors-button');
   const colorsColorButtons = element.querySelectorAll('.colors-color-button');
-  const historyElement = openButton.nextElementSibling as HTMLElement;
+  const flagsAddForm = element.querySelector('.flags-add-form');
+  const flagsContainer = element.querySelector('.flags-container');
 
-  let isClosed = true;
+  let isChangesClosed = true;
+  let isFlagsClosed = true;
 
-  const documentClickHandler = (e) => {
-    toggleElement();
+  const documentChangesClickHandler = (e) => {
+    toggleChanges();
   };
 
-  const toggleElement = () => {
+  const documentFlagsClickHandler = (e) => {
+    toggleFlags();
+  };
+
+  const toggleChanges = () => {
     if (parameters.changes.length === 0) {
       return;
     }
 
-    isClosed = !isClosed;
+    isChangesClosed = !isChangesClosed;
 
-    historyElement.style.height = isClosed ? '0px' : '200px';
-    historyElement.style.width = isClosed ? '0px' : '500px';
-    historyElement.style.opacity = isClosed ? '0' : '1';
+    changes.style.height = isChangesClosed ? '0px' : '200px';
+    changes.style.width = isChangesClosed ? '0px' : '500px';
+    changes.style.opacity = isChangesClosed ? '0' : '1';
 
-    if (isClosed) {
-      document.removeEventListener('mousedown', documentClickHandler);
+    if (isChangesClosed) {
+      document.removeEventListener('mousedown', documentChangesClickHandler);
     } else {
-      document.addEventListener('mousedown', documentClickHandler);
+      document.addEventListener('mousedown', documentChangesClickHandler);
+    }
+  };
+
+  const toggleFlags = async () => {
+    if (isFlagsClosed) {
+      await renderFlags(getFlags, addFlag, removeFlag, item, flagsContainer);
+    }
+
+    isFlagsClosed = !isFlagsClosed;
+
+    flags.style.height = isFlagsClosed ? '0px' : '200px';
+    flags.style.width = isFlagsClosed ? '0px' : '500px';
+    flags.style.opacity = isFlagsClosed ? '0' : '1';
+
+    if (isFlagsClosed) {
+      document.removeEventListener('mousedown', documentFlagsClickHandler);
+    } else {
+      document.addEventListener('mousedown', documentFlagsClickHandler);
     }
   };
 
@@ -431,8 +668,11 @@ const initToolbar = (root, item, currentDatetime, propertiesToCheck, stringToPri
     setColorTheme(root, item.color);
   };
 
-  openButton.addEventListener('click', toggleElement);
-  closeButton.addEventListener('click', toggleElement);
+  changesOpenButton.addEventListener('click', toggleChanges);
+  changesCloseButton.addEventListener('click', toggleChanges);
+
+  flagsOpenButton.addEventListener('click', toggleFlags);
+  flagsCloseButton.addEventListener('click', toggleFlags);
 
   colorsButton.addEventListener('mouseenter', colorsHandler);
 
@@ -446,6 +686,35 @@ const initToolbar = (root, item, currentDatetime, propertiesToCheck, stringToPri
 
   root.addEventListener( 'mousedown', (e) => {
     e.stopPropagation();
+  });
+
+  root.addEventListener( 'keydown', (e) => {
+    e.stopPropagation();
+  });
+
+  flagsAddForm.addEventListener( 'submit', (e) => {
+    e.preventDefault();
+
+    const call = async () => {
+      const data = new FormData(flagsAddForm);
+      const title = data.get('title');
+
+      if (!title) {
+        return;
+      }
+
+      const nameInput = flagsAddForm.querySelector('input[name=title]');
+
+      nameInput.value = '';
+
+      nameInput.blur();
+
+      await addFlag(item, title);
+
+      await renderFlags(getFlags, addFlag, removeFlag, item, flagsContainer);
+    };
+
+    call();
   });
 };
 

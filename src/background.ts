@@ -69,7 +69,7 @@ const getCommentsCount = async (namespace, ids) => {
   return result;
 };
 
-const getCurrentDatetime = async (token, namespace, items) => {
+const getListData = async (token, namespace, items) => {
   const params = new URLSearchParams();
 
   params.append('token', token);
@@ -83,7 +83,10 @@ const getCurrentDatetime = async (token, namespace, items) => {
     const response = await fetch(`https://siloor.com/meerkat/api/list?${params}`);
     const data = await response.json();
 
-    return new Date(data.data.current_datetime);
+    return {
+      currentDatetime: new Date(data.data.current_datetime),
+      flags: data.data.flags,
+    };
   } catch(e) { }
 
   return null;
@@ -147,7 +150,7 @@ const migrate = async () => {
 };
 
 const getList = async (sendResponse, token, namespace, propertiesToCheck, version, items) => {
-  const currentDatetime = await getCurrentDatetime(token, namespace, items);
+  const { currentDatetime, flags } = await getListData(token, namespace, items);
   const timestamp = currentDatetime.getTime();
 
   const originalOrder = items.map(item => item[BASE_PROPERTIES.ID]);
@@ -202,7 +205,8 @@ const getList = async (sendResponse, token, namespace, propertiesToCheck, versio
   const itemObjects = newItems.map(item => ({
     history: item.history,
     color: item.color,
-    commentCount: commentCountMap[item.history[0][BASE_PROPERTIES.ID]]
+    commentCount: commentCountMap[item.history[0][BASE_PROPERTIES.ID]],
+    flags: flags[item.history[0][BASE_PROPERTIES.ID]]
   }));
 
   sendResponse({
@@ -283,6 +287,54 @@ const setColor = async (sendResponse, namespace, id, color) => {
   sendResponse();
 };
 
+const addFlag = async (sendResponse, token, namespace, id, title) => {
+  const formData = new FormData();
+
+  formData.append('token', token);
+  formData.append('namespace', namespace);
+  formData.append('item', id);
+  formData.append('title', title);
+
+  const response = await fetch(`https://siloor.com/meerkat/api/flag`, {
+    method: 'POST',
+    body: formData
+  });
+
+  const data = await response.json();
+
+  sendResponse();
+};
+
+const removeFlag = async (sendResponse, token, namespace, id, title) => {
+  const params = new URLSearchParams();
+
+  params.append('token', token);
+  params.append('namespace', namespace);
+  params.append('item', id);
+  params.append('title', title);
+
+  const response = await fetch(`https://siloor.com/meerkat/api/flag?${params}`, {
+    method: 'DELETE'
+  });
+
+  const data = await response.json();
+
+  sendResponse();
+};
+
+const getFlags = async (sendResponse, token, namespace, id) => {
+  const params = new URLSearchParams();
+
+  params.append('token', token);
+  params.append('namespace', namespace);
+  params.append('item', id);
+
+  const response = await fetch(`https://siloor.com/meerkat/api/flag?${params}`);
+  const data = await response.json();
+
+  sendResponse(data.data.flags);
+};
+
 chrome.runtime.onMessage.addListener(
   (request, sender, sendResponse) => {
     if (request.message === SERVICES.GET_LIST) {
@@ -324,6 +376,20 @@ chrome.runtime.onMessage.addListener(
       return true;
     } else if (request.message === SERVICES.SET_COLOR) {
       setColor(sendResponse, request.namespace, request.id, request.color);
+
+      return true;
+    } else if (request.message === SERVICES.ADD_FLAG) {
+      sendEvent('extension', 'addFlag', request.namespace);
+
+      addFlag(sendResponse, token, request.namespace, request.id, request.title);
+
+      return true;
+    } else if (request.message === SERVICES.REMOVE_FLAG) {
+      removeFlag(sendResponse, token, request.namespace, request.id, request.title);
+
+      return true;
+    } else if (request.message === SERVICES.GET_FLAGS) {
+      getFlags(sendResponse, token, request.namespace, request.id);
 
       return true;
     }

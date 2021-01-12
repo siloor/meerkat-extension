@@ -80,57 +80,116 @@ const stringToPrice = (price) => {
   };
 };
 
+const callService = (name, data) => {
+  return new Promise((resolve, reject) => {
+    const message = {
+      message: name,
+      ...data
+    };
+
+    chrome.runtime.sendMessage(message, (response) => {
+      resolve(response);
+    });
+  });
+};
+
 const openComments = (item) => {
   const state = item.history[item.history.length - 1];
 
-  chrome.runtime.sendMessage({
-    message: SERVICES.OPEN_COMMENTS,
+  return callService(SERVICES.OPEN_COMMENTS, {
     namespace: NAMESPACE,
     language: getLanguage(),
     id: state[BASE_PROPERTIES.ID],
     title: '',
     description: state[PROPERTIES.DESCRIPTION],
     picture: state[PROPERTIES.PICTURE]
-  }, (response) => {});
+  });
 };
 
 const setColor = (item, color) => {
   const state = item.history[item.history.length - 1];
 
-  chrome.runtime.sendMessage({
-    message: SERVICES.SET_COLOR,
+  return callService(SERVICES.SET_COLOR, {
     namespace: NAMESPACE,
     id: state[BASE_PROPERTIES.ID],
     color: color
-  }, (response) => {});
+  });
 };
 
-const start = () => {
+const addFlag = (item, title) => {
+  const state = item.history[item.history.length - 1];
+
+  return callService(SERVICES.ADD_FLAG, {
+    namespace: NAMESPACE,
+    id: state[BASE_PROPERTIES.ID],
+    title: title
+  });
+};
+
+const removeFlag = (item, title) => {
+  const state = item.history[item.history.length - 1];
+
+  return callService(SERVICES.REMOVE_FLAG, {
+    namespace: NAMESPACE,
+    id: state[BASE_PROPERTIES.ID],
+    title: title
+  });
+};
+
+const getFlags = async (item) => {
+  const state = item.history[item.history.length - 1];
+
+  return callService(SERVICES.GET_FLAGS, {
+    namespace: NAMESPACE,
+    id: state[BASE_PROPERTIES.ID]
+  });
+};
+
+const start = async () => {
   if (window.location.pathname.indexOf('/lista') === 0 || window.location.pathname.indexOf('/szukites') === 0) {
+    const styleDiv = document.createElement('div');
+
+    styleDiv.innerHTML = `
+      <link rel="preconnect" href="https://fonts.gstatic.com" />
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    `;
+
+    document.body.appendChild(styleDiv);
+
     const items = [].slice.call(document.getElementsByClassName('listing'));
 
-    chrome.runtime.sendMessage({
-      message: SERVICES.GET_LIST,
+    const response: any = await callService(SERVICES.GET_LIST, {
       items: items.map(item => getItemData(item)),
       namespace: NAMESPACE,
       propertiesToCheck: propertiesToCheck.map(property => property.name),
       version: 1
-    }, (response) => {
-      for (let i = 0; i < items.length; i++) {
-        const div = document.createElement('div');
-
-        const shadow = div.attachShadow({ mode: 'closed' });
-
-        div.style.float = 'left';
-        div.style.width = '100%';
-        div.style.position = 'relative';
-        div.style.zIndex = '107';
-
-        items[i].appendChild(div);
-
-        getToolbar().initToolbar(shadow, response.items[i], response.currentDatetime, propertiesToCheck, stringToPrice, openComments, setColor);
-      }
     });
+
+    for (let i = 0; i < items.length; i++) {
+      const div = document.createElement('div');
+
+      const shadow = div.attachShadow({ mode: 'closed' });
+
+      div.style.float = 'left';
+      div.style.width = '100%';
+      div.style.position = 'relative';
+      div.style.zIndex = '107';
+
+      items[i].appendChild(div);
+
+      getToolbar().initToolbar(
+        shadow,
+        response.items[i],
+        response.currentDatetime,
+        propertiesToCheck,
+        stringToPrice,
+        openComments,
+        setColor,
+        addFlag,
+        removeFlag,
+        getFlags
+      );
+    }
   }
 };
 
