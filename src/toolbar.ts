@@ -409,11 +409,46 @@ const renderElement = ({
       margin-left: 16px;
       margin-right: 6px;
       float: right;
+      position: relative;
+      opacity: 0.5;
+    }
+
+    .colors-button.open {
+      opacity: 1;
+    }
+
+    .colors-button-icon {
       width: 20px;
       height: 20px;
       box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
       border-radius: 10px;
-      position: relative;
+    }
+
+    .colors-button-icon span {
+      display: block;
+      float: left;
+      width: 10px;
+      height: 10px;
+    }
+
+    .colors-button-icon span:nth-child(1) {
+      border-top-left-radius: 10px;
+      background: #f86b43;
+    }
+
+    .colors-button-icon span:nth-child(2) {
+      border-top-right-radius: 10px;
+      background: #92c523;
+    }
+
+    .colors-button-icon span:nth-child(3) {
+      border-bottom-left-radius: 10px;
+      background: #01b6f1;
+    }
+
+    .colors-button-icon span:nth-child(4) {
+      border-bottom-right-radius: 10px;
+      background: #ffc644;
     }
 
     .colors-container {
@@ -425,6 +460,10 @@ const renderElement = ({
       height: 60px;
       background: rgba(0, 0, 0, 0.4);
       border-radius: 10px;
+    }
+
+    .colors-button.open .colors-container {
+      display: block;
     }
 
     .colors-color-button {
@@ -482,7 +521,13 @@ const renderElement = ({
       </div>
     </div>
     <a class="comments-button" style="color: ${commentCount > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'}; display: none;" href="javascript:void(0);">${translations.comments} (${commentCount})</a>
-    <div class="colors-button" href="javascript:void(0);">
+    <div class="colors-button">
+      <div class="colors-button-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
       <div class="colors-container">
         ${colorsHTML.map(html => html.trim()).join('')}
       </div>
@@ -652,19 +697,15 @@ const initToolbar = (
   };
 
   const colorsLeaveHandler = () => {
-    const colorsContainer = colorsButton.firstElementChild;
-
     colorsButton.removeEventListener('mouseleave', colorsLeaveHandler);
 
-    colorsContainer.style.display = 'none';
+    colorsButton.classList.remove('open');
   };
 
   const colorsHandler = (e) => {
-    const colorsContainer = colorsButton.firstElementChild;
-
     colorsButton.addEventListener('mouseleave', colorsLeaveHandler);
 
-    colorsContainer.style.display = 'block';
+    colorsButton.classList.add('open');
   };
 
   const colorsColorClickHandler = (e) => {
