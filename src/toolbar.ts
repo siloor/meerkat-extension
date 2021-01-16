@@ -42,7 +42,7 @@ const colors = {
   }
 };
 
-const translationsToolbar = getTranslations({
+const translations = getTranslations({
   en: {
     firstSaw: 'First saw',
     daysAgo: 'days ago',
@@ -120,20 +120,20 @@ const renderElement = ({
     } else if (type === PROPERTY_TYPES.URL) {
       return [
         oldValue
-          ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translationsToolbar.oldUrl}</a>`
-          : `<span style="text-decoration: line-through;">${translationsToolbar.oldUrl}</span>`,
+          ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldUrl}</a>`
+          : `<span style="text-decoration: line-through;">${translations.oldUrl}</span>`,
         value
-          ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translationsToolbar.newUrl}</a>`
-          : `<span style="text-decoration: line-through;">${translationsToolbar.newUrl}</span>`
+          ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newUrl}</a>`
+          : `<span style="text-decoration: line-through;">${translations.newUrl}</span>`
       ].join(' - ');
     } else if (type === PROPERTY_TYPES.IMAGE) {
       return [
         oldValue
-          ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translationsToolbar.oldImage}</a>`
-          : `<span style="text-decoration: line-through;">${translationsToolbar.oldImage}</span>`,
+          ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldImage}</a>`
+          : `<span style="text-decoration: line-through;">${translations.oldImage}</span>`,
         value
-          ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translationsToolbar.newImage}</a>`
-          : `<span style="text-decoration: line-through;">${translationsToolbar.newImage}</span>`
+          ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newImage}</a>`
+          : `<span style="text-decoration: line-through;">${translations.newImage}</span>`
       ].join(' - ');
     }
 
@@ -438,17 +438,17 @@ const renderElement = ({
   </style>
   <div class="container">
     <span class="logo">M</span>
-    <span class="date" title="${translationsToolbar.firstSaw}: ${timestampToString(creationDate)}">${days} ${translationsToolbar.daysAgo}</span>
-    <span class="price-difference" style="font-weight: ${priceDifference === 0 || priceDifference === null ? 'normal' : 'bold'}; color: ${priceDifference === 0 || priceDifference === null ? 'rgba(0, 0, 0, 0.4)' : (priceDifference > 0 ? '#ff4500' : '#39b54a')};" title="${translationsToolbar.priceChange}">${priceDifference > 0 ? '+' : ''}${numberToString(priceDifference)}${currency === null ? '' : ` ${currency}`}</span>
-    <a class="changes-button" style="color: ${changes.length > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translationsToolbar.changes} (${changes.length})</a>
+    <span class="date" title="${translations.firstSaw}: ${timestampToString(creationDate)}">${days} ${translations.daysAgo}</span>
+    <span class="price-difference" style="font-weight: ${priceDifference === 0 || priceDifference === null ? 'normal' : 'bold'}; color: ${priceDifference === 0 || priceDifference === null ? 'rgba(0, 0, 0, 0.4)' : (priceDifference > 0 ? '#ff4500' : '#39b54a')};" title="${translations.priceChange}">${priceDifference > 0 ? '+' : ''}${numberToString(priceDifference)}${currency === null ? '' : ` ${currency}`}</span>
+    <a class="changes-button" style="color: ${changes.length > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translations.changes} (${changes.length})</a>
     <div class="changes">
       <div class="changes-container">
         <div class="changes-container-inner">
           <table>
             <thead>
-              <th style="width: 70px;">${translationsToolbar.changesLabelType}</th>
-              <th style="width: 90px;">${translationsToolbar.changesLabelDate}</th>
-              <th>${translationsToolbar.changesLabelValue}</th>
+              <th style="width: 70px;">${translations.changesLabelType}</th>
+              <th style="width: 90px;">${translations.changesLabelDate}</th>
+              <th>${translations.changesLabelValue}</th>
             </thead>
             <tbody>
               ${changesHTML.map(html => html.trim()).join('')}
@@ -460,9 +460,9 @@ const renderElement = ({
         <a href="javascript:void(0);" class="logo changes-close-button">X</a>
       </div>
     </div>
-    <a class="flags-button" style="color: ${true ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translationsToolbar.flags} (${flags.count})${flags.top ? ` <span>${flags.top.title}</span>` : ''}</a>
+    <a class="flags-button" style="color: ${true ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translations.flags} (${flags.count})${flags.top ? ` <span>${flags.top.title}</span>` : ''}</a>
     <div class="flags">
-      <div class="flags-header">${translationsToolbar.flags}</div>
+      <div class="flags-header">${translations.flags}</div>
       <div class="flags-container">
         <div class="flags-container-inner">
           <ul></ul>
@@ -472,16 +472,16 @@ const renderElement = ({
         <a href="javascript:void(0);" class="logo flags-close-button">X</a>
         <form class="flags-add-form">
           <div class="flags-add-start">
-            <button>${translationsToolbar.flagAddStart}</button>
+            <button>${translations.flagAddStart}</button>
           </div>
           <div class="flags-add-inputs">
             <input type="text" name="title" />
-            <button>${translationsToolbar.flagAdd}</button>
+            <button>${translations.flagAdd}</button>
           </div>
         </form>
       </div>
     </div>
-    <a class="comments-button" style="color: ${commentCount > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'}; display: none;" href="javascript:void(0);">${translationsToolbar.comments} (${commentCount})</a>
+    <a class="comments-button" style="color: ${commentCount > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'}; display: none;" href="javascript:void(0);">${translations.comments} (${commentCount})</a>
     <div class="colors-button" href="javascript:void(0);">
       <div class="colors-container">
         ${colorsHTML.map(html => html.trim()).join('')}
@@ -507,7 +507,7 @@ const renderFlags = async (getFlags, addFlag, removeFlag, item, flagsContainer) 
         .join('')
     }</ul>`;
   } else {
-    flagsContainer.querySelector('.flags-container-inner').innerHTML = `<p class="flags-empty-text">${translationsToolbar.flagsEmptyText}</p>`;
+    flagsContainer.querySelector('.flags-container-inner').innerHTML = `<p class="flags-empty-text">${translations.flagsEmptyText}</p>`;
   }
 
   const flagButtons = flagsContainer.querySelectorAll('li');

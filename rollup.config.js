@@ -34,7 +34,7 @@ for (const input of inputs) {
       output: [
         {
           file: 'build-dev/background.js',
-          format: 'esm'
+          format: 'iife'
         }
       ],
       plugins: [
@@ -50,7 +50,7 @@ for (const input of inputs) {
     output: [
       {
         dir: `${rootDir}${input.indexOf('sites/') === 0 ? '/sites' : ''}`,
-        format: 'esm'
+        format: 'iife'
       }
     ],
     plugins: [

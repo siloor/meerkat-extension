@@ -1,6 +1,6 @@
 // https://github.com/soxhub/htmldiff.js
 
-var Match, calculate_operations, consecutive_where, create_index, diff, find_match, find_matching_blocks, html_to_tokens, is_end_of_tag, is_start_of_tag, is_tag, is_whitespace, isnt_tag, op_map, recursively_find_matching_blocks, render_operations, wrap;
+var Match, calculate_operations, consecutive_where, create_index, diff, find_match, find_matching_blocks, html_to_tokens, is_end_of_tag, is_start_of_tag, is_tag, img_tag, is_tag_except_img, is_whitespace, isnt_tag, op_map, recursively_find_matching_blocks, render_operations, wrap;
 
 is_end_of_tag = function(char) {
   return char === '>';
