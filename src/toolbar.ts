@@ -56,9 +56,10 @@ const translationsToolbar = getTranslations({
     newUrl: 'New link',
     oldImage: 'Old image',
     newImage: 'New image',
-    flags: 'Flags',
+    flags: 'Tags',
     flagAdd: 'Add',
-    flagsEmptyText: 'There are no added flags yet. Be the first and add one!'
+    flagAddStart: 'Add tag',
+    flagsEmptyText: 'There are no added tags yet. Be the first and add one!'
   },
   hu: {
     firstSaw: 'Első megtekintés',
@@ -73,9 +74,10 @@ const translationsToolbar = getTranslations({
     newUrl: 'Új link',
     oldImage: 'Régi kép',
     newImage: 'Új kép',
-    flags: 'Flag-ek',
+    flags: 'Címkék',
     flagAdd: 'Hozzáadás',
-    flagsEmptyText: 'Nincs még hozzáadott flag. Legyél te az első és adj hozzá egyet!'
+    flagAddStart: 'Címke hozzáadása',
+    flagsEmptyText: 'Nincs még hozzáadott címke. Legyél te az első és adj hozzá egyet!'
   }
 });
 
@@ -385,9 +387,8 @@ const renderElement = ({
 
     .flags-add-form button {
       margin: 5px 20px 5px 0;
-      width: 100px;
       box-sizing: content-box;
-      padding: 4px;
+      padding: 4px 14px;
       height: 16px;
       border: 1px solid #999;
       border-radius: 4px;
@@ -397,7 +398,7 @@ const renderElement = ({
     .flags-add-form button:focus {
       outline: 0;
       border: 2px solid #000;
-      padding: 3px;
+      padding: 3px 13px;
     }
 
     .comments-button {
@@ -470,8 +471,13 @@ const renderElement = ({
       <div>
         <a href="javascript:void(0);" class="logo flags-close-button">X</a>
         <form class="flags-add-form">
-          <input type="text" name="title" />
-          <button>${translationsToolbar.flagAdd}</button>
+          <div class="flags-add-start">
+            <button>${translationsToolbar.flagAddStart}</button>
+          </div>
+          <div class="flags-add-inputs">
+            <input type="text" name="title" />
+            <button>${translationsToolbar.flagAdd}</button>
+          </div>
         </form>
       </div>
     </div>
@@ -484,6 +490,11 @@ const renderElement = ({
   </div>
 </div>
 `;
+};
+
+const showFlagInputs = (flagsAddStart, flagsAddInputs, show) => {
+  flagsAddStart.style.display = show ? 'none' : 'block';
+  flagsAddInputs.style.display = show ? 'block' : 'none';
 };
 
 const renderFlags = async (getFlags, addFlag, removeFlag, item, flagsContainer) => {
@@ -587,6 +598,8 @@ const initToolbar = (
   const colorsButton = element.querySelector('.colors-button');
   const colorsColorButtons = element.querySelectorAll('.colors-color-button');
   const flagsAddForm = element.querySelector('.flags-add-form');
+  const flagsAddStart = element.querySelector('.flags-add-start');
+  const flagsAddInputs = element.querySelector('.flags-add-inputs');
   const flagsContainer = element.querySelector('.flags-container');
 
   let isChangesClosed = true;
@@ -632,6 +645,8 @@ const initToolbar = (
     if (isFlagsClosed) {
       document.removeEventListener('mousedown', documentFlagsClickHandler);
     } else {
+      showFlagInputs(flagsAddStart, flagsAddInputs, false);
+
       document.addEventListener('mousedown', documentFlagsClickHandler);
     }
   };
@@ -692,6 +707,10 @@ const initToolbar = (
     e.stopPropagation();
   });
 
+  flagsAddStart.addEventListener('click', (e) => {
+    showFlagInputs(flagsAddStart, flagsAddInputs, true);
+  });
+
   flagsAddForm.addEventListener( 'submit', (e) => {
     e.preventDefault();
 
@@ -708,6 +727,8 @@ const initToolbar = (
       nameInput.value = '';
 
       nameInput.blur();
+
+      showFlagInputs(flagsAddStart, flagsAddInputs, false);
 
       await addFlag(item, title);
 
