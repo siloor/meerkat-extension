@@ -2,6 +2,7 @@ import { BASE_PROPERTIES, SERVICES, PROPERTY_TYPES } from '../constants';
 import { textContentWithSeparator, removeUnnecessaryWhitespace } from '../utils';
 import { getLanguage, getTranslations } from '../translations';
 import { getToolbar } from '../dic';
+import { callService, addCustomFont, getItemCurrentState, setColor, addFlag, removeFlag, getFlags } from '../sites-common';
 
 const NAMESPACE = 'hasznaltauto.hu';
 
@@ -83,21 +84,8 @@ const stringToPrice = (price) => {
   };
 };
 
-const callService = (name, data) => {
-  return new Promise((resolve, reject) => {
-    const message = {
-      message: name,
-      ...data
-    };
-
-    chrome.runtime.sendMessage(message, (response) => {
-      resolve(response);
-    });
-  });
-};
-
 const openComments = (item) => {
-  const state = item.history[item.history.length - 1];
+  const state = getItemCurrentState(item);
 
   return callService(SERVICES.OPEN_COMMENTS, {
     namespace: NAMESPACE,
@@ -109,55 +97,9 @@ const openComments = (item) => {
   });
 };
 
-const setColor = (item, color) => {
-  const state = item.history[item.history.length - 1];
-
-  return callService(SERVICES.SET_COLOR, {
-    namespace: NAMESPACE,
-    id: state[BASE_PROPERTIES.ID],
-    color: color
-  });
-};
-
-const addFlag = (item, title) => {
-  const state = item.history[item.history.length - 1];
-
-  return callService(SERVICES.ADD_FLAG, {
-    namespace: NAMESPACE,
-    id: state[BASE_PROPERTIES.ID],
-    title: title
-  });
-};
-
-const removeFlag = (item, title) => {
-  const state = item.history[item.history.length - 1];
-
-  return callService(SERVICES.REMOVE_FLAG, {
-    namespace: NAMESPACE,
-    id: state[BASE_PROPERTIES.ID],
-    title: title
-  });
-};
-
-const getFlags = async (item) => {
-  const state = item.history[item.history.length - 1];
-
-  return callService(SERVICES.GET_FLAGS, {
-    namespace: NAMESPACE,
-    id: state[BASE_PROPERTIES.ID]
-  });
-};
-
 const start = async () => {
   if (window.location.pathname.indexOf('/talalatilista') === 0) {
-    const styleDiv = document.createElement('div');
-
-    styleDiv.innerHTML = `
-      <link rel="preconnect" href="https://fonts.gstatic.com" />
-      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-    `;
-
-    document.body.appendChild(styleDiv);
+    addCustomFont(document);
 
     const items = [].slice.call(document.getElementsByClassName('talalati-sor'));
 
@@ -185,10 +127,10 @@ const start = async () => {
         propertiesToCheck,
         stringToPrice,
         openComments,
-        setColor,
-        addFlag,
-        removeFlag,
-        getFlags
+        setColor(NAMESPACE),
+        addFlag(NAMESPACE),
+        removeFlag(NAMESPACE),
+        getFlags(NAMESPACE)
       );
     }
   }
