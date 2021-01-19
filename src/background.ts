@@ -415,3 +415,5 @@ if (config.buildEnv === 'production') {
     }
   });
 }
+
+chrome.browserAction.disable();
