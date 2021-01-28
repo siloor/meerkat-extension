@@ -15,6 +15,7 @@ const inputs = [
   'sites/hasznaltauto.hu.ts',
   'sites/ingatlan.com.ts',
   'sites/ingatlan.jofogas.hu.ts',
+  'sites/mobile.de.ts',
 ];
 
 const rootDir = production ? 'build' : 'build-dev';

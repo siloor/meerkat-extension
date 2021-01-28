@@ -184,17 +184,16 @@ const getList = async (sendResponse, token, namespace, propertiesToCheck, versio
 
   await storage.set(savedItems);
 
-  const newItems = Object.values(savedItems);
+  const savedItemsValues = Object.values(savedItems);
 
-  newItems.sort((a, b) => {
-    const aIndex = originalOrder.indexOf(a.history[0][BASE_PROPERTIES.ID]);
-    const bIndex = originalOrder.indexOf(b.history[0][BASE_PROPERTIES.ID]);
-
-    if (aIndex === bIndex) {
-      return 0;
+  const newItems = originalOrder.map((originalOrderId) => {
+    for (const savedItemValue of savedItemsValues) {
+      if (savedItemValue.history[0][BASE_PROPERTIES.ID] === originalOrderId) {
+        return savedItemValue;
+      }
     }
 
-    return aIndex > bIndex ? 1 : -1;
+    return null;
   });
 
   const commentCountMap = await getCommentsCount(

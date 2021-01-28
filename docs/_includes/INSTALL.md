@@ -10,6 +10,7 @@ Adds commenting ability to every product on the marketplace. This way customers 
 * hasznaltauto.hu
 * ingatlan.com
 * ingatlan.jofogas.hu
+* mobile.de
 
 ### We are comparing product data the legal way
 * No third party database to store the data. We are storing the products properties in the customer's browser.

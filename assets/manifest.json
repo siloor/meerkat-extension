@@ -17,6 +17,10 @@
     {
       "matches": ["*://ingatlan.jofogas.hu/*"],
       "js": ["toolbar.js", "sites/ingatlan.jofogas.hu.js"]
+    },
+    {
+      "matches": ["*://suchen.mobile.de/*"],
+      "js": ["toolbar.js", "sites/mobile.de.js"]
     }
   ],
   "icons": {
