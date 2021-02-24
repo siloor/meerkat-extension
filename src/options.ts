@@ -47,7 +47,8 @@ const renderStorageInfo = () => {
       'hasznaltauto.hu': 'https://www.hasznaltauto.hu/favicon.ico',
       'ingatlan.jofogas.hu': 'https://ingatlan.jofogas.hu/img/favicon.ico',
       'ingatlan.com': 'https://ingatlan.com/images/favicons/favicon.ico',
-      'mobile.de': 'https://suchen.mobile.de/favicon.ico'
+      'mobile.de': 'https://suchen.mobile.de/favicon.ico',
+      'immobilienscout24.de': 'https://www.immobilienscout24.de/favicon.ico'
     };
 
     storageInfoContainer.innerHTML = response.namespaces.map(namespace => `

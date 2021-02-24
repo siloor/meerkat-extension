@@ -1,3 +1,7 @@
+## 0.0.9
+
+* Added immobilienscout24.de support
+
 ## 0.0.8
 
 * Added mobile.de support

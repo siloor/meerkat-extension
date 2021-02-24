@@ -12,10 +12,12 @@ const inputs = [
   'toolbar.ts',
   'popup.ts',
   'options.ts',
+  'content.ts',
   'sites/hasznaltauto.hu.ts',
   'sites/ingatlan.com.ts',
   'sites/ingatlan.jofogas.hu.ts',
   'sites/mobile.de.ts',
+  'sites/immobilienscout24.de.ts',
 ];
 
 const rootDir = production ? 'build' : 'build-dev';

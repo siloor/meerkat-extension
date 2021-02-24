@@ -4,7 +4,7 @@ import { getLanguage, getTranslations } from '../translations';
 import { getToolbar } from '../dic';
 import { callService, addCustomFont, getItemCurrentState, setColor, addFlag, removeFlag, getFlags } from '../sites-common';
 
-const NAMESPACE = 'mobile.de';
+const NAMESPACE = 'immobilienscout24.de';
 
 const PROPERTIES = {
   TITLE: 'title',
@@ -39,55 +39,89 @@ const propertiesToCheck = [
   { name: PROPERTIES.DESCRIPTION, title: translations[PROPERTIES.DESCRIPTION], type: PROPERTY_TYPES.TEXT }
 ];
 
-const getId = (link) => {
-  const params = new URLSearchParams(link.search);
-
-  return params.get('id');
+const nodeListToArray = (list: NodeList) => {
+  return [].slice.call(list);
 };
 
-const getUrl = (href) => {
-  const a = document.createElement('a');
+const getTitle = (item) => {
+  const div = document.createElement('div');
 
-  a.href = href;
+  div.innerHTML = item.querySelector('h5').innerHTML;
 
-  const originalParams = new URLSearchParams(a.search);
-  const params = new URLSearchParams();
+  const spans = nodeListToArray(div.querySelectorAll('span'));
 
-  params.set('id', originalParams.get('id'));
-  params.set('damageUnrepaired', originalParams.get('damageUnrepaired'));
+  for (const span of spans) {
+    span.remove();
+  }
 
-  a.search = params.toString();
-
-  return a.href;
+  return removeUnnecessaryWhitespace(textContentWithSeparator(div));
 };
 
-const getImage = (image) => {
+const getPrice = (item) => {
+  const attributes = nodeListToArray(item.querySelectorAll('.result-list-entry__criteria dl'));
+
+  for (const attribute of attributes) {
+    const term = attribute.querySelector('dt');
+
+    if (term && (term.innerText === 'Kaufpreis' || term.innerText === 'Preis')) {
+      return attribute.querySelector('dd').innerText;
+    }
+  }
+
+  return null;
+};
+
+const getImage = (item) => {
+  let image = item.querySelector('.slick-current .gallery__image');
+
+  if (!image) {
+    image = item.querySelector('.gallery__image');
+  }
+
   if (!image) {
     return null;
   }
 
-  const { src } = image;
+  let src = image.src || image.getAttribute('data-lazy-src') || image.getAttribute('data-lazy');
 
   if (!src) {
     return null;
   }
 
-  return src.replace(/\$\_\d+\.jpg/, '$_90.jpg');
+  src = src.replace(/\/ORIG.*/, '');
+
+  if (src.indexOf('http') !== src.lastIndexOf('http')) {
+    src = src.substr(src.lastIndexOf('http'));
+  }
+
+  return src;
 };
 
 const getDescription = (item) => {
-  return removeUnnecessaryWhitespace(textContentWithSeparator(item.querySelector('.rbt-regMilPow').parentElement));
+  const div = document.createElement('div');
+
+  div.innerHTML = item.querySelector('.result-list-entry__criteria').innerHTML;
+
+  const attributes = nodeListToArray(div.querySelectorAll('dl'));
+
+  for (const attribute of attributes) {
+    const term = attribute.querySelector('dt');
+
+    if (term && (term.innerText === 'Kaufpreis' || term.innerText === 'Preis')) {
+      attribute.remove();
+    }
+  }
+
+  return removeUnnecessaryWhitespace(textContentWithSeparator(div));
 };
 
 const getItemData = (item) => {
-  const link = item.querySelector('a');
-
   return {
-    [BASE_PROPERTIES.ID]: getId(link),
-    [PROPERTIES.TITLE]: item.querySelector('.headline-block .h3').textContent,
-    [PROPERTIES.PRICE]: item.querySelector('.price-block .h3').textContent,
-    [PROPERTIES.URL]: getUrl(link.href),
-    [PROPERTIES.PICTURE]: getImage(item.querySelector('.image-block img')),
+    [BASE_PROPERTIES.ID]: item.getAttribute('data-id'),
+    [PROPERTIES.TITLE]: getTitle(item),
+    [PROPERTIES.PRICE]: getPrice(item),
+    [PROPERTIES.URL]: item.querySelector('h5').closest('a').href,
+    [PROPERTIES.PICTURE]: getImage(item),
     [PROPERTIES.DESCRIPTION]: getDescription(item)
   };
 };
@@ -115,7 +149,7 @@ const openComments = (item) => {
 };
 
 const start = async () => {
-  const items = [].slice.call(document.querySelectorAll('.cBox-body--resultitem, .cBox-body--topResultitem'));
+  const items = [].slice.call(document.querySelectorAll('.result-list__listing[data-id]'));
 
   const response: any = await callService(SERVICES.GET_LIST, {
     items: items.map(item => getItemData(item)),
@@ -132,9 +166,9 @@ const start = async () => {
     div.style.float = 'left';
     div.style.width = '100%';
     div.style.position = 'relative';
-    div.style.zIndex = '1000';
+    div.style.zIndex = '4';
 
-    items[i].appendChild(div);
+    items[i].firstElementChild.appendChild(div);
 
     getToolbar().initToolbar(
       shadow,
@@ -151,11 +185,24 @@ const start = async () => {
   }
 };
 
-if (
-  window.location.pathname.indexOf('/fahrzeuge/search.html') === 0 &&
-  window.location.search.indexOf('isSearchRequest=true') !== -1
-) {
+if (window.location.pathname.indexOf('/Suche/') === 0) {
   addCustomFont(document);
+
+  const observer = new MutationObserver(function(mutations) {
+    for(const mutation of mutations) {
+      if (mutation.type === 'childList' && mutation.removedNodes.length) {
+        const first = mutation.removedNodes[0] as HTMLElement;
+
+        const isWaitingElement = first.querySelector('.result-list-entry__waiting') !== null;
+
+        if (isWaitingElement) {
+          start();
+        }
+      }
+    }
+  });
+
+  observer.observe(document.querySelector('#resultListItems'), { childList: true });
 
   start();
 }

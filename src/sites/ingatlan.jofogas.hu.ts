@@ -88,42 +88,42 @@ const openComments = (item) => {
 const start = async () => {
   const list = document.getElementsByClassName('list-items');
 
-  if (list.length) {
-    addCustomFont(document);
+  const items = [].slice.call(list[0].getElementsByClassName('list-item'));
 
-    const items = [].slice.call(list[0].getElementsByClassName('list-item'));
+  const response: any = await callService(SERVICES.GET_LIST, {
+    items: items.map(item => getItemData(item)),
+    namespace: NAMESPACE,
+    propertiesToCheck: propertiesToCheck.map(property => property.name),
+    version: 1
+  });
 
-    const response: any = await callService(SERVICES.GET_LIST, {
-      items: items.map(item => getItemData(item)),
-      namespace: NAMESPACE,
-      propertiesToCheck: propertiesToCheck.map(property => property.name),
-      version: 1
-    });
+  for (let i = 0; i < items.length; i++) {
+    const div = document.createElement('div');
 
-    for (let i = 0; i < items.length; i++) {
-      const div = document.createElement('div');
+    const shadow = div.attachShadow({ mode: 'closed' });
 
-      const shadow = div.attachShadow({ mode: 'closed' });
+    div.style.position = 'absolute';
+    div.style.bottom = '0px';
 
-      div.style.position = 'absolute';
-      div.style.bottom = '0px';
+    items[i].getElementsByClassName('contentArea')[0].appendChild(div);
 
-      items[i].getElementsByClassName('contentArea')[0].appendChild(div);
-
-      getToolbar().initToolbar(
-        shadow,
-        response.items[i],
-        response.currentDatetime,
-        propertiesToCheck,
-        stringToPrice,
-        openComments,
-        setColor(NAMESPACE),
-        addFlag(NAMESPACE),
-        removeFlag(NAMESPACE),
-        getFlags(NAMESPACE)
-      );
-    }
+    getToolbar().initToolbar(
+      shadow,
+      response.items[i],
+      response.currentDatetime,
+      propertiesToCheck,
+      stringToPrice,
+      openComments,
+      setColor(NAMESPACE),
+      addFlag(NAMESPACE),
+      removeFlag(NAMESPACE),
+      getFlags(NAMESPACE)
+    );
   }
 };
 
-start();
+if (document.getElementsByClassName('list-items').length) {
+  addCustomFont(document);
+
+  start();
+}

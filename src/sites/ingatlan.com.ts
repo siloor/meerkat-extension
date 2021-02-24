@@ -95,44 +95,44 @@ const openComments = (item) => {
 };
 
 const start = async () => {
-  if (window.location.pathname.indexOf('/lista') === 0 || window.location.pathname.indexOf('/szukites') === 0) {
-    addCustomFont(document);
+  const items = [].slice.call(document.getElementsByClassName('listing'));
 
-    const items = [].slice.call(document.getElementsByClassName('listing'));
+  const response: any = await callService(SERVICES.GET_LIST, {
+    items: items.map(item => getItemData(item)),
+    namespace: NAMESPACE,
+    propertiesToCheck: propertiesToCheck.map(property => property.name),
+    version: 1
+  });
 
-    const response: any = await callService(SERVICES.GET_LIST, {
-      items: items.map(item => getItemData(item)),
-      namespace: NAMESPACE,
-      propertiesToCheck: propertiesToCheck.map(property => property.name),
-      version: 1
-    });
+  for (let i = 0; i < items.length; i++) {
+    const div = document.createElement('div');
 
-    for (let i = 0; i < items.length; i++) {
-      const div = document.createElement('div');
+    const shadow = div.attachShadow({ mode: 'closed' });
 
-      const shadow = div.attachShadow({ mode: 'closed' });
+    div.style.float = 'left';
+    div.style.width = '100%';
+    div.style.position = 'relative';
+    div.style.zIndex = '107';
 
-      div.style.float = 'left';
-      div.style.width = '100%';
-      div.style.position = 'relative';
-      div.style.zIndex = '107';
+    items[i].appendChild(div);
 
-      items[i].appendChild(div);
-
-      getToolbar().initToolbar(
-        shadow,
-        response.items[i],
-        response.currentDatetime,
-        propertiesToCheck,
-        stringToPrice,
-        openComments,
-        setColor(NAMESPACE),
-        addFlag(NAMESPACE),
-        removeFlag(NAMESPACE),
-        getFlags(NAMESPACE)
-      );
-    }
+    getToolbar().initToolbar(
+      shadow,
+      response.items[i],
+      response.currentDatetime,
+      propertiesToCheck,
+      stringToPrice,
+      openComments,
+      setColor(NAMESPACE),
+      addFlag(NAMESPACE),
+      removeFlag(NAMESPACE),
+      getFlags(NAMESPACE)
+    );
   }
 };
 
-start();
+if (window.location.pathname.indexOf('/lista') === 0 || window.location.pathname.indexOf('/szukites') === 0) {
+  addCustomFont(document);
+
+  start();
+}

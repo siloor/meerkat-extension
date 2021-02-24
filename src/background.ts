@@ -391,6 +391,24 @@ chrome.runtime.onMessage.addListener(
       getFlags(sendResponse, token, request.namespace, request.id);
 
       return true;
+    } else if (request.message === 'runContentScript') {
+      if (sender.url.match(".*://www.immobilienscout24.de/.*")) {
+        chrome.tabs.executeScript(
+          sender.tab.id,
+          {
+            file: 'toolbar.js'
+          }
+        );
+
+        chrome.tabs.executeScript(
+          sender.tab.id,
+          {
+            file: 'sites/immobilienscout24.de.js'
+          }
+        );
+      }
+
+      return true;
     }
   }
 );

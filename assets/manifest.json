@@ -21,6 +21,12 @@
     {
       "matches": ["*://suchen.mobile.de/*"],
       "js": ["toolbar.js", "sites/mobile.de.js"]
+    },
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": ["content.js"]
     }
   ],
   "icons": {
@@ -38,8 +44,8 @@
   "permissions": [
     "storage",
     "unlimitedStorage",
-    "https://disqus.com/",
-    "https://siloor.com/"
+    "http://*/",
+    "https://*/"
   ],
   "content_security_policy": "script-src 'self' https://www.google-analytics.com; object-src 'self'"
 }
