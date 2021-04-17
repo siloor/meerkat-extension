@@ -7,22 +7,6 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.hasznaltauto.hu/*"],
-      "js": ["toolbar.js", "sites/hasznaltauto.hu.js"]
-    },
-    {
-      "matches": ["*://*.ingatlan.com/*"],
-      "js": ["toolbar.js", "sites/ingatlan.com.js"]
-    },
-    {
-      "matches": ["*://ingatlan.jofogas.hu/*"],
-      "js": ["toolbar.js", "sites/ingatlan.jofogas.hu.js"]
-    },
-    {
-      "matches": ["*://suchen.mobile.de/*"],
-      "js": ["toolbar.js", "sites/mobile.de.js"]
-    },
-    {
       "matches": [
         "<all_urls>"
       ],

@@ -1,4 +1,4 @@
-import { BASE_PROPERTIES, SERVICES } from './constants';
+import { BASE_PROPERTIES, SERVICES, RUN_CONTENT_SCRIPT } from './constants';
 import { initAnalytics, sendEvent } from './analytics';
 import { storage } from './storage';
 import config from './config';
@@ -107,6 +107,39 @@ const migrate = async () => {
 
     await setStoreVersion(2);
   }
+};
+
+const getSiteScript = (url) => {
+  const sites = [
+    {
+      matches: ['.*://.*\\.hasznaltauto\\.hu/.*'],
+      js: ['sites/hasznaltauto.hu.js']
+    },
+    {
+      matches: ['.*://.*\\.ingatlan\\.com/.*'],
+      js: ['sites/ingatlan.com.js']
+    },
+    {
+      matches: ['.*://ingatlan\\.jofogas\\.hu/.*'],
+      js: ['sites/ingatlan.jofogas.hu.js']
+    },
+    {
+      matches: ['.*://suchen\\.mobile\\.de/.*'],
+      js: ['sites/mobile.de.js']
+    },
+    {
+      matches: ['.*://www\\.immobilienscout24\\.de/.*'],
+      js: ['sites/immobilienscout24.de.js']
+    },
+  ];
+
+  const site = sites.find((site) => {
+    return site.matches.find((regex) => {
+      return url.match(regex);
+    });
+  });
+
+  return site ? site.js[0] : null;
 };
 
 const getList = async (sendResponse, token, namespace, propertiesToCheck, version, items) => {
@@ -322,8 +355,10 @@ chrome.runtime.onMessage.addListener(
       getFlags(sendResponse, token, request.namespace, request.id);
 
       return true;
-    } else if (request.message === 'runContentScript') {
-      if (sender.url.match(".*://www.immobilienscout24.de/.*")) {
+    } else if (request.message === RUN_CONTENT_SCRIPT) {
+      const siteScript = getSiteScript(sender.url);
+
+      if (siteScript) {
         chrome.tabs.executeScript(
           sender.tab.id,
           {
@@ -334,7 +369,7 @@ chrome.runtime.onMessage.addListener(
         chrome.tabs.executeScript(
           sender.tab.id,
           {
-            file: 'sites/immobilienscout24.de.js'
+            file: siteScript
           }
         );
       }

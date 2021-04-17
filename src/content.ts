@@ -1,6 +1,8 @@
+import { RUN_CONTENT_SCRIPT } from './constants';
+
 chrome.runtime.sendMessage(
   {
-    message: 'runContentScript'
+    message: RUN_CONTENT_SCRIPT
   },
   (response) => {}
 );

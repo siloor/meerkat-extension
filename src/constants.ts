@@ -5,6 +5,8 @@ export const BASE_PROPERTIES = {
   VERSION: '_v'
 };
 
+export const RUN_CONTENT_SCRIPT = 'run_content_script';
+
 export const SERVICES = {
   GET_LIST: 'get_list',
   GET_NAMESPACES_INFO: 'get_namespaces_info',
