@@ -1,4 +1,4 @@
-export const getLanguage = () => {
+const getLanguage = () => {
   const language = window.navigator.language.split('-')[0];
   const allowedLanguages = ['en', 'hu'];
 

@@ -24,7 +24,7 @@ export const addCustomFont = (document) => {
   document.body.appendChild(styleDiv);
 };
 
-export const getItemCurrentState = (item) => {
+const getItemCurrentState = (item) => {
   return item.history[item.history.length - 1];
 };
 

@@ -51,7 +51,6 @@ const translations = getTranslations({
     changesLabelType: 'Type',
     changesLabelDate: 'Date',
     changesLabelValue: 'Value',
-    comments: 'Comments',
     oldUrl: 'Old link',
     newUrl: 'New link',
     oldImage: 'Old image',
@@ -69,7 +68,6 @@ const translations = getTranslations({
     changesLabelType: 'Típus',
     changesLabelDate: 'Dátum',
     changesLabelValue: 'Érték',
-    comments: 'Hozzászólások',
     oldUrl: 'Régi link',
     newUrl: 'Új link',
     oldImage: 'Régi kép',
@@ -110,7 +108,6 @@ const renderElement = ({
   days,
   priceDifference,
   currency,
-  commentCount,
   flags,
   changes
 }) => {
@@ -401,10 +398,6 @@ const renderElement = ({
       padding: 3px 13px;
     }
 
-    .comments-button {
-      margin-left: 16px;
-    }
-
     .colors-button {
       margin-left: 16px;
       margin-right: 6px;
@@ -520,7 +513,6 @@ const renderElement = ({
         </form>
       </div>
     </div>
-    <a class="comments-button" style="color: ${commentCount > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'}; display: none;" href="javascript:void(0);">${translations.comments} (${commentCount})</a>
     <div class="colors-button">
       <div class="colors-button-icon">
         <span></span>
@@ -573,7 +565,7 @@ const renderFlags = async (getFlags, addFlag, removeFlag, item, flagsContainer) 
   }
 };
 
-const getElementParameters = (history, commentCount, flags, currentDatetime, propertiesToCheck, stringToPrice) => {
+const getElementParameters = (history, flags, currentDatetime, propertiesToCheck, stringToPrice) => {
   const oldPrice = stringToPrice(history[0].price);
   const newPrice = stringToPrice(history[history.length - 1].price);
 
@@ -602,7 +594,6 @@ const getElementParameters = (history, commentCount, flags, currentDatetime, pro
     days: Math.round(((new Date(currentDatetime)).getTime() - history[0][BASE_PROPERTIES.CREATED_TIMESTAMP]) / (1000 * 60 * 60 * 24)),
     priceDifference: oldPrice.value === null && newPrice.value === null ? null : newPrice.value - oldPrice.value,
     currency: oldPrice.currency === null ? newPrice.currency : oldPrice.currency,
-    commentCount: commentCount,
     flags: flags,
     changes
   };
@@ -620,13 +611,12 @@ const initToolbar = (
   currentDatetime,
   propertiesToCheck,
   stringToPrice,
-  openComments,
   setColor,
   addFlag,
   removeFlag,
   getFlags
 ) => {
-  const parameters = getElementParameters(item.history, item.commentCount, item.flags, currentDatetime, propertiesToCheck, stringToPrice);
+  const parameters = getElementParameters(item.history, item.flags, currentDatetime, propertiesToCheck, stringToPrice);
 
   root.innerHTML = renderElement(parameters).trim();
 
@@ -639,7 +629,6 @@ const initToolbar = (
   const flagsOpenButton = element.querySelector('.flags-button');
   const flagsCloseButton = element.querySelector('.flags-close-button');
   const flags = element.querySelector('.flags');
-  const commentsButton = element.querySelector('.comments-button');
   const colorsButton = element.querySelector('.colors-button');
   const colorsColorButtons = element.querySelectorAll('.colors-color-button');
   const flagsAddForm = element.querySelector('.flags-add-form');
@@ -735,10 +724,6 @@ const initToolbar = (
   for (const colorsColorButton of colorsColorButtons) {
     colorsColorButton.addEventListener('click', colorsColorClickHandler);
   }
-
-  commentsButton.addEventListener('click', () => {
-    openComments(item);
-  });
 
   root.addEventListener( 'mousedown', (e) => {
     e.stopPropagation();

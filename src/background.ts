@@ -15,10 +15,6 @@ const getNamespaceFromStorageKey = (key) => {
   return parts.length > 1 ? parts[1] : null;
 };
 
-const getDisqusIdentifier = (namespace, id) => {
-  return `${namespace}_${id}`;
-};
-
 const getIsNewState = (lastSavedItem, item, propertiesToCheck) => {
   if (lastSavedItem === null) {
     return true;
@@ -31,42 +27,6 @@ const getIsNewState = (lastSavedItem, item, propertiesToCheck) => {
   }
 
   return false;
-};
-
-const getCommentsCount = async (namespace, ids) => {
-  const params = new URLSearchParams();
-
-  params.append('forum', 'meerkat-for-a-transparent-market');
-  params.append('api_key', 'E8Uh5l5fHZ6gD8U3KycjAIAk46f68Zw7C6eW8WSjZvCLXebZ7p0r1yrYDrLilk2F');
-
-  for (const id of ids) {
-    params.append('thread[]', `ident:/${getDisqusIdentifier(namespace, id)}`);
-  }
-
-  let threads = [];
-
-  try {
-    const response = await fetch(`https://disqus.com/api/3.0/threads/set.json?${params}`);
-    const data = await response.json();
-
-    threads = data.response;
-  } catch(e) { }
-
-  const countMap = {};
-
-  for (const thread of threads) {
-    const id = thread.identifiers[0].replace(/^\//, '').replace(`${namespace}_`, '');
-
-    countMap[id] = thread.posts;
-  }
-
-  const result = {};
-
-  for (const id of ids) {
-    result[id] = countMap[id] ? countMap[id] : 0;
-  }
-
-  return result;
 };
 
 const getListData = async (token, namespace, items) => {
@@ -196,15 +156,9 @@ const getList = async (sendResponse, token, namespace, propertiesToCheck, versio
     return null;
   });
 
-  const commentCountMap = await getCommentsCount(
-    namespace,
-    newItems.map(item => item.history[0][BASE_PROPERTIES.ID])
-  );
-
   const itemObjects = newItems.map(item => ({
     history: item.history,
     color: item.color,
-    commentCount: commentCountMap[item.history[0][BASE_PROPERTIES.ID]],
     flags: flags[item.history[0][BASE_PROPERTIES.ID]]
   }));
 
@@ -348,29 +302,6 @@ chrome.runtime.onMessage.addListener(
       return true;
     } else if (request.message === SERVICES.CLEAR_NAMESPACE) {
       clearNamespace(sendResponse, request.namespace);
-
-      return true;
-    } else if (request.message === SERVICES.OPEN_COMMENTS) {
-      sendEvent('extension', 'openComments', request.namespace);
-
-      const width = 900;
-      const height = 700;
-      const left = (screen.width - width) / 2;
-      const top = (screen.height - height) / 2;
-
-      const data = {
-        disqusIdentifier: getDisqusIdentifier(request.namespace, request.id),
-        language: request.language,
-        title: request.title,
-        description: request.description,
-        picture: request.picture
-      };
-
-      window.open(
-        `popup.html?data=${encodeURIComponent(JSON.stringify(data))}`,
-        'extension_popup',
-        `width=${width},height=${height},top=${top},left=${left}`
-      );
 
       return true;
     } else if (request.message === SERVICES.SET_COLOR) {

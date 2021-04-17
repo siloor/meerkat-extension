@@ -10,7 +10,6 @@ const config = [];
 const inputs = [
   'background.ts',
   'toolbar.ts',
-  'popup.ts',
   'options.ts',
   'content.ts',
   'sites/hasznaltauto.hu.ts',
@@ -66,7 +65,6 @@ config[0].plugins.push(copy({
   targets: [
     { src: `assets/${production ? 'icons' : 'icons-dev'}/*`, dest: `${rootDir}/icons` },
     { src: 'assets/options.html', dest: rootDir },
-    { src: 'assets/popup.html', dest: rootDir },
     {
       src: 'assets/manifest.json',
       dest: rootDir,

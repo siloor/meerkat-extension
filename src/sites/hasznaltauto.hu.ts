@@ -1,8 +1,8 @@
 import { BASE_PROPERTIES, SERVICES, PROPERTY_TYPES } from '../constants';
 import { textContentWithSeparator, removeUnnecessaryWhitespace } from '../utils';
-import { getLanguage, getTranslations } from '../translations';
+import { getTranslations } from '../translations';
 import { getToolbar } from '../dic';
-import { callService, addCustomFont, getItemCurrentState, setColor, addFlag, removeFlag, getFlags } from '../sites-common';
+import { callService, addCustomFont, setColor, addFlag, removeFlag, getFlags } from '../sites-common';
 
 const NAMESPACE = 'hasznaltauto.hu';
 
@@ -84,19 +84,6 @@ const stringToPrice = (price) => {
   };
 };
 
-const openComments = (item) => {
-  const state = getItemCurrentState(item);
-
-  return callService(SERVICES.OPEN_COMMENTS, {
-    namespace: NAMESPACE,
-    language: getLanguage(),
-    id: state[BASE_PROPERTIES.ID],
-    title: state[PROPERTIES.TITLE],
-    description: state[PROPERTIES.DESCRIPTION],
-    picture: state[PROPERTIES.PICTURE]
-  });
-};
-
 const start = async () => {
   const items = [].slice.call(document.getElementsByClassName('talalati-sor'));
 
@@ -123,7 +110,6 @@ const start = async () => {
       response.currentDatetime,
       propertiesToCheck,
       stringToPrice,
-      openComments,
       setColor(NAMESPACE),
       addFlag(NAMESPACE),
       removeFlag(NAMESPACE),
