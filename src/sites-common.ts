@@ -47,32 +47,3 @@ export const setNote = (NAMESPACE) => (item, note) => {
     note: note
   });
 };
-
-export const addFlag = (NAMESPACE) => (item, title) => {
-  const state = getItemCurrentState(item);
-
-  return callService(SERVICES.ADD_FLAG, {
-    namespace: NAMESPACE,
-    id: state[BASE_PROPERTIES.ID],
-    title: title
-  });
-};
-
-export const removeFlag = (NAMESPACE) => (item, title) => {
-  const state = getItemCurrentState(item);
-
-  return callService(SERVICES.REMOVE_FLAG, {
-    namespace: NAMESPACE,
-    id: state[BASE_PROPERTIES.ID],
-    title: title
-  });
-};
-
-export const getFlags = (NAMESPACE) => (item) => {
-  const state = getItemCurrentState(item);
-
-  return callService(SERVICES.GET_FLAGS, {
-    namespace: NAMESPACE,
-    id: state[BASE_PROPERTIES.ID]
-  });
-};

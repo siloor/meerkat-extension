@@ -12,10 +12,7 @@ export const SERVICES = {
   GET_NAMESPACES_INFO: 'get_namespaces_info',
   CLEAR_NAMESPACE: 'clear_namespace',
   SET_COLOR: 'set_color',
-  SET_NOTE: 'set_note',
-  ADD_FLAG: 'add_flag',
-  REMOVE_FLAG: 'remove_flag',
-  GET_FLAGS: 'get_flags'
+  SET_NOTE: 'set_note'
 };
 
 export const PROPERTY_TYPES = {

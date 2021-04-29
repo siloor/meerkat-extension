@@ -45,7 +45,6 @@ const getListData = async (token, namespace, items) => {
 
     return {
       currentDatetime: new Date(data.data.current_datetime),
-      flags: data.data.flags,
     };
   } catch(e) { }
 
@@ -143,7 +142,7 @@ const getSiteScript = (url) => {
 };
 
 const getList = async (sendResponse, token, namespace, propertiesToCheck, version, items) => {
-  const { currentDatetime, flags } = await getListData(token, namespace, items);
+  const { currentDatetime } = await getListData(token, namespace, items);
   const timestamp = currentDatetime.getTime();
 
   const originalOrder = items.map(item => item[BASE_PROPERTIES.ID]);
@@ -192,8 +191,7 @@ const getList = async (sendResponse, token, namespace, propertiesToCheck, versio
   const itemObjects = newItems.map(item => ({
     history: item.history,
     color: item.color,
-    note: item.note,
-    flags: flags[item.history[0][BASE_PROPERTIES.ID]]
+    note: item.note
   }));
 
   sendResponse({
@@ -290,54 +288,6 @@ const setNote = async (sendResponse, namespace, id, note) => {
   sendResponse();
 };
 
-const addFlag = async (sendResponse, token, namespace, id, title) => {
-  const formData = new FormData();
-
-  formData.append('token', token);
-  formData.append('namespace', namespace);
-  formData.append('item', id);
-  formData.append('title', title);
-
-  const response = await fetch(`https://siloor.com/meerkat/api/flag`, {
-    method: 'POST',
-    body: formData
-  });
-
-  const data = await response.json();
-
-  sendResponse();
-};
-
-const removeFlag = async (sendResponse, token, namespace, id, title) => {
-  const params = new URLSearchParams();
-
-  params.append('token', token);
-  params.append('namespace', namespace);
-  params.append('item', id);
-  params.append('title', title);
-
-  const response = await fetch(`https://siloor.com/meerkat/api/flag?${params}`, {
-    method: 'DELETE'
-  });
-
-  const data = await response.json();
-
-  sendResponse();
-};
-
-const getFlags = async (sendResponse, token, namespace, id) => {
-  const params = new URLSearchParams();
-
-  params.append('token', token);
-  params.append('namespace', namespace);
-  params.append('item', id);
-
-  const response = await fetch(`https://siloor.com/meerkat/api/flag?${params}`);
-  const data = await response.json();
-
-  sendResponse(data.data.flags);
-};
-
 chrome.runtime.onMessage.addListener(
   (request, sender, sendResponse) => {
     if (request.message === SERVICES.GET_LIST) {
@@ -360,20 +310,6 @@ chrome.runtime.onMessage.addListener(
       return true;
     } else if (request.message === SERVICES.SET_NOTE) {
       setNote(sendResponse, request.namespace, request.id, request.note);
-
-      return true;
-    } else if (request.message === SERVICES.ADD_FLAG) {
-      sendEvent('extension', 'addFlag', request.namespace);
-
-      addFlag(sendResponse, token, request.namespace, request.id, request.title);
-
-      return true;
-    } else if (request.message === SERVICES.REMOVE_FLAG) {
-      removeFlag(sendResponse, token, request.namespace, request.id, request.title);
-
-      return true;
-    } else if (request.message === SERVICES.GET_FLAGS) {
-      getFlags(sendResponse, token, request.namespace, request.id);
 
       return true;
     } else if (request.message === RUN_CONTENT_SCRIPT) {

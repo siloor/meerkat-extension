@@ -55,10 +55,6 @@ const translations = getTranslations({
     newUrl: 'New link',
     oldImage: 'Old image',
     newImage: 'New image',
-    flags: 'Tags',
-    flagAdd: 'Add',
-    flagAddStart: 'Add tag',
-    flagsEmptyText: 'There are no added tags yet. Be the first and add one!',
     note: 'Note',
     noteSave: 'Save',
     notePlaceholder: 'Take a note...'
@@ -75,10 +71,6 @@ const translations = getTranslations({
     newUrl: 'Új link',
     oldImage: 'Régi kép',
     newImage: 'Új kép',
-    flags: 'Címkék',
-    flagAdd: 'Hozzáadás',
-    flagAddStart: 'Címke hozzáadása',
-    flagsEmptyText: 'Nincs még hozzáadott címke. Legyél te az első és adj hozzá egyet!',
     note: 'Jegyzet',
     noteSave: 'Mentés',
     notePlaceholder: 'Ide jegyzetelj...'
@@ -114,7 +106,6 @@ const renderElement = ({
   days,
   priceDifference,
   currency,
-  flags,
   changes
 }) => {
   const renderDiff = (oldValue, value, type) => {
@@ -261,147 +252,6 @@ const renderElement = ({
       padding: 8px;
       overflow: hidden;
       text-overflow: ellipsis;
-    }
-
-    .flags-button {
-      margin-left: 16px;
-    }
-
-    .flags-button span {
-      background-color: #fff;
-      padding: 2px 5px;
-      border-radius: 10px;
-      margin-left: 3px;
-    }
-
-    .flags-close-button {
-      margin: 8px;
-    }
-
-    .flags {
-      position: absolute;
-      z-index: 1;
-      bottom: 0;
-      left: 0;
-      background: #eee;
-      width: 0;
-      height: 0;
-      opacity: 0;
-      border-radius: 16px;
-      overflow: hidden;
-      transition: width 0.2s, height 0.2s, opacity 0.2s;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .flags-header {
-      padding: 10px;
-      font-size: 14px;
-    }
-
-    .flags-container {
-      padding: 10px 10px 0 10px;
-      overflow: auto;
-      flex-grow: 1;
-    }
-
-    .flags-container-inner {
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-    }
-
-    .flags-empty-text {
-      margin: 0;
-    }
-
-    .flags ul {
-      list-style-type: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .flags ul li {
-      position: relative;
-      display: block;
-      float: left;
-      background-color: rgba(255, 255, 255, 0.75);
-      padding: 6px 10px;
-      margin: 3px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-
-    .flags ul li span {
-      display: none;
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: 30px;
-      height: 29px;
-      line-height: 29px;
-      text-align: center;
-      border-top-right-radius: 10px;
-      border-bottom-right-radius: 10px;
-      font-size: 21px;
-      background-color: #555;
-      color: #fff;
-    }
-
-    .flags ul li span:before {
-      content: "+";
-    }
-
-    .flags ul li:hover span {
-      display: block;
-    }
-
-    .flags ul li.flagged {
-      background-color: rgba(0, 0, 0, 0.5);
-      color: #fff;
-    }
-
-    .flags ul li.flagged span:before {
-      content: "-";
-    }
-
-    .flags-add-form {
-      float: right;
-    }
-
-    .flags-add-form input {
-      display: block;
-      float: left;
-      margin: 5px;
-      width: 200px;
-      padding: 4px;
-      height: 16px;
-      border: 1px solid #999;
-      border-radius: 4px;
-    }
-
-    .flags-add-form input:focus {
-      outline: 0;
-      border: 2px solid #000;
-      padding: 3px;
-    }
-
-    .flags-add-form button {
-      margin: 5px 20px 5px 0;
-      box-sizing: content-box;
-      padding: 4px 14px;
-      height: 16px;
-      border: 1px solid #999;
-      border-radius: 4px;
-      font-size: 13px;
-    }
-
-    .flags-add-form button:focus {
-      outline: 0;
-      border: 2px solid #000;
-      padding: 3px 13px;
     }
 
     .note-button {
@@ -594,27 +444,6 @@ const renderElement = ({
         <a href="javascript:void(0);" class="logo changes-close-button">X</a>
       </div>
     </div>
-    <a class="flags-button" style="color: ${true ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translations.flags} (${flags.count})${flags.top ? ` <span>${flags.top.title}</span>` : ''}</a>
-    <div class="flags">
-      <div class="flags-header">${translations.flags}</div>
-      <div class="flags-container">
-        <div class="flags-container-inner">
-          <ul></ul>
-        </div>
-      </div>
-      <div>
-        <a href="javascript:void(0);" class="logo flags-close-button">X</a>
-        <form class="flags-add-form">
-          <div class="flags-add-start">
-            <button>${translations.flagAddStart}</button>
-          </div>
-          <div class="flags-add-inputs">
-            <input type="text" name="title" />
-            <button>${translations.flagAdd}</button>
-          </div>
-        </form>
-      </div>
-    </div>
     <a class="note-button" style="color: ${true ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translations.note}<span></span></a>
     <div class="note">
       <div class="note-header">${translations.note}</div>
@@ -646,43 +475,7 @@ const renderElement = ({
 `;
 };
 
-const showFlagInputs = (flagsAddStart, flagsAddInputs, show) => {
-  flagsAddStart.style.display = show ? 'none' : 'block';
-  flagsAddInputs.style.display = show ? 'block' : 'none';
-};
-
-const renderFlags = async (getFlags, addFlag, removeFlag, item, flagsContainer) => {
-  const flags = await getFlags(item);
-
-  if (flags.length) {
-    flagsContainer.querySelector('.flags-container-inner').innerHTML = `<ul>${
-      flags
-        .map(flag => `<li class="${flag.flagged ? 'flagged' : ''}" data-title="${flag.title}">${flag.title} (${flag.count})<span></span></li>`)
-        .join('')
-    }</ul>`;
-  } else {
-    flagsContainer.querySelector('.flags-container-inner').innerHTML = `<p class="flags-empty-text">${translations.flagsEmptyText}</p>`;
-  }
-
-  const flagButtons = flagsContainer.querySelectorAll('li');
-
-  for (const flagButton of flagButtons) {
-    flagButton.addEventListener('click', async (e) => {
-      const flagged = e.currentTarget.classList.contains('flagged');
-      const title = e.currentTarget.getAttribute('data-title');
-
-      if (flagged) {
-        await removeFlag(item, title);
-      } else {
-        await addFlag(item, title);
-      }
-
-      await renderFlags(getFlags, addFlag, removeFlag, item, flagsContainer);
-    });
-  }
-};
-
-const getElementParameters = (history, flags, currentDatetime, propertiesToCheck, stringToPrice) => {
+const getElementParameters = (history, currentDatetime, propertiesToCheck, stringToPrice) => {
   const oldPrice = stringToPrice(history[0].price);
   const newPrice = stringToPrice(history[history.length - 1].price);
 
@@ -711,19 +504,17 @@ const getElementParameters = (history, flags, currentDatetime, propertiesToCheck
     days: Math.round(((new Date(currentDatetime)).getTime() - history[0][BASE_PROPERTIES.CREATED_TIMESTAMP]) / (1000 * 60 * 60 * 24)),
     priceDifference: oldPrice.value === null && newPrice.value === null ? null : newPrice.value - oldPrice.value,
     currency: oldPrice.currency === null ? newPrice.currency : oldPrice.currency,
-    flags: flags,
     changes
   };
 };
 
-const setColorState = (root, color) => {
+const setColorState = (element, color) => {
   const theme = color && colors[color] ? colors[color] : colors.default;
 
-  root.firstElementChild.style.setProperty('--meerkat-container-background', theme.containerBackground);
+  element.style.setProperty('--meerkat-container-background', theme.containerBackground);
 };
 
-const setNoteState = (root, note) => {
-  const noteOpenButtonSpan = root.querySelector('.note-button span');
+const setNoteState = (noteOpenButtonSpan, note) => {
   const isEmpty = note === undefined;
 
   noteOpenButtonSpan.style.display = isEmpty ? 'none' : 'inline-block';
@@ -737,47 +528,33 @@ const initToolbar = (
   propertiesToCheck,
   stringToPrice,
   setColor,
-  setNote,
-  addFlag,
-  removeFlag,
-  getFlags
+  setNote
 ) => {
-  const parameters = getElementParameters(item.history, item.flags, currentDatetime, propertiesToCheck, stringToPrice);
+  const parameters = getElementParameters(item.history, currentDatetime, propertiesToCheck, stringToPrice);
 
   root.innerHTML = renderElement(parameters).trim();
-
-  setColorState(root, item.color);
-  setNoteState(root, item.note);
 
   const element = root.firstElementChild;
   const changesOpenButton = element.querySelector('.changes-button');
   const changesCloseButton = element.querySelector('.changes-close-button');
   const changes = element.querySelector('.changes');
-  const flagsOpenButton = element.querySelector('.flags-button');
-  const flagsCloseButton = element.querySelector('.flags-close-button');
-  const flags = element.querySelector('.flags');
   const colorsButton = element.querySelector('.colors-button');
   const colorsColorButtons = element.querySelectorAll('.colors-color-button');
-  const flagsAddForm = element.querySelector('.flags-add-form');
-  const flagsAddStart = element.querySelector('.flags-add-start');
-  const flagsAddInputs = element.querySelector('.flags-add-inputs');
-  const flagsContainer = element.querySelector('.flags-container');
   const noteOpenButton = element.querySelector('.note-button');
+  const noteOpenButtonSpan = element.querySelector('.note-button span');
   const noteCloseButton = element.querySelector('.note-close-button');
   const note = element.querySelector('.note');
   const noteForm = element.querySelector('.note-form');
   const noteTextarea = element.querySelector('.note textarea');
 
+  setColorState(element, item.color);
+  setNoteState(noteOpenButtonSpan, item.note);
+
   let isChangesClosed = true;
-  let isFlagsClosed = true;
   let isNoteClosed = true;
 
   const documentChangesClickHandler = (e) => {
     toggleChanges();
-  };
-
-  const documentFlagsClickHandler = (e) => {
-    toggleFlags();
   };
 
   const documentNoteClickHandler = (e) => {
@@ -799,26 +576,6 @@ const initToolbar = (
       document.removeEventListener('mousedown', documentChangesClickHandler);
     } else {
       document.addEventListener('mousedown', documentChangesClickHandler);
-    }
-  };
-
-  const toggleFlags = async () => {
-    if (isFlagsClosed) {
-      await renderFlags(getFlags, addFlag, removeFlag, item, flagsContainer);
-    }
-
-    isFlagsClosed = !isFlagsClosed;
-
-    flags.style.height = isFlagsClosed ? '0px' : '200px';
-    flags.style.width = isFlagsClosed ? '0px' : '500px';
-    flags.style.opacity = isFlagsClosed ? '0' : '1';
-
-    if (isFlagsClosed) {
-      document.removeEventListener('mousedown', documentFlagsClickHandler);
-    } else {
-      showFlagInputs(flagsAddStart, flagsAddInputs, false);
-
-      document.addEventListener('mousedown', documentFlagsClickHandler);
     }
   };
 
@@ -864,14 +621,11 @@ const initToolbar = (
       item.color = color;
     }
 
-    setColorState(root, item.color);
+    setColorState(element, item.color);
   };
 
   changesOpenButton.addEventListener('click', toggleChanges);
   changesCloseButton.addEventListener('click', toggleChanges);
-
-  flagsOpenButton.addEventListener('click', toggleFlags);
-  flagsCloseButton.addEventListener('click', toggleFlags);
 
   noteOpenButton.addEventListener('click', toggleNote);
   noteCloseButton.addEventListener('click', toggleNote);
@@ -890,37 +644,6 @@ const initToolbar = (
     e.stopPropagation();
   });
 
-  flagsAddStart.addEventListener('click', (e) => {
-    showFlagInputs(flagsAddStart, flagsAddInputs, true);
-  });
-
-  flagsAddForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const call = async () => {
-      const data = new FormData(flagsAddForm);
-      const title = data.get('title');
-
-      if (!title) {
-        return;
-      }
-
-      const nameInput = flagsAddForm.querySelector('input[name=title]');
-
-      nameInput.value = '';
-
-      nameInput.blur();
-
-      showFlagInputs(flagsAddStart, flagsAddInputs, false);
-
-      await addFlag(item, title);
-
-      await renderFlags(getFlags, addFlag, removeFlag, item, flagsContainer);
-    };
-
-    call();
-  });
-
   noteForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -934,7 +657,7 @@ const initToolbar = (
       item.note = note;
     }
 
-    setNoteState(root, item.note);
+    setNoteState(noteOpenButtonSpan, item.note);
 
     toggleNote();
   });
