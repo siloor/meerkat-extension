@@ -192,6 +192,7 @@ const getList = async (sendResponse, token, namespace, propertiesToCheck, versio
   const itemObjects = newItems.map(item => ({
     history: item.history,
     color: item.color,
+    note: item.note,
     flags: flags[item.history[0][BASE_PROPERTIES.ID]]
   }));
 
@@ -273,6 +274,22 @@ const setColor = async (sendResponse, namespace, id, color) => {
   sendResponse();
 };
 
+const setNote = async (sendResponse, namespace, id, note) => {
+  const itemKey = getItemStorageKey(namespace, id);
+
+  const item = (await storage.get(itemKey))[itemKey];
+
+  if (note === null) {
+    delete item.note;
+  } else {
+    item.note = note;
+  }
+
+  await storage.set({ [itemKey]: item });
+
+  sendResponse();
+};
+
 const addFlag = async (sendResponse, token, namespace, id, title) => {
   const formData = new FormData();
 
@@ -339,6 +356,10 @@ chrome.runtime.onMessage.addListener(
       return true;
     } else if (request.message === SERVICES.SET_COLOR) {
       setColor(sendResponse, request.namespace, request.id, request.color);
+
+      return true;
+    } else if (request.message === SERVICES.SET_NOTE) {
+      setNote(sendResponse, request.namespace, request.id, request.note);
 
       return true;
     } else if (request.message === SERVICES.ADD_FLAG) {

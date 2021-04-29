@@ -38,6 +38,16 @@ export const setColor = (NAMESPACE) => (item, color) => {
   });
 };
 
+export const setNote = (NAMESPACE) => (item, note) => {
+  const state = getItemCurrentState(item);
+
+  return callService(SERVICES.SET_NOTE, {
+    namespace: NAMESPACE,
+    id: state[BASE_PROPERTIES.ID],
+    note: note
+  });
+};
+
 export const addFlag = (NAMESPACE) => (item, title) => {
   const state = getItemCurrentState(item);
 

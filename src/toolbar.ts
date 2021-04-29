@@ -58,7 +58,10 @@ const translations = getTranslations({
     flags: 'Tags',
     flagAdd: 'Add',
     flagAddStart: 'Add tag',
-    flagsEmptyText: 'There are no added tags yet. Be the first and add one!'
+    flagsEmptyText: 'There are no added tags yet. Be the first and add one!',
+    note: 'Note',
+    noteSave: 'Save',
+    notePlaceholder: 'Take a note...'
   },
   hu: {
     firstSaw: 'Első megtekintés',
@@ -75,7 +78,10 @@ const translations = getTranslations({
     flags: 'Címkék',
     flagAdd: 'Hozzáadás',
     flagAddStart: 'Címke hozzáadása',
-    flagsEmptyText: 'Nincs még hozzáadott címke. Legyél te az első és adj hozzá egyet!'
+    flagsEmptyText: 'Nincs még hozzáadott címke. Legyél te az első és adj hozzá egyet!',
+    note: 'Jegyzet',
+    noteSave: 'Mentés',
+    notePlaceholder: 'Ide jegyzetelj...'
   }
 });
 
@@ -398,6 +404,102 @@ const renderElement = ({
       padding: 3px 13px;
     }
 
+    .note-button {
+      margin-left: 16px;
+    }
+
+    .note-button span {
+      background-color: #fff;
+      padding: 2px 5px;
+      border-radius: 10px;
+      margin-left: 8px;
+      display: inline-block;
+      vertical-align: bottom;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 40px;
+    }
+
+    .note-close-button {
+      margin: 8px;
+    }
+
+    .note {
+      position: absolute;
+      z-index: 1;
+      bottom: 0;
+      left: 0;
+      background: #eee;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: width 0.2s, height 0.2s, opacity 0.2s;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .note-container {
+      padding: 0 10px 0 10px;
+      overflow: auto;
+      flex-grow: 1;
+    }
+
+    .note-container-inner {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+    }
+
+    .note-container-inner textarea {
+      display: block;
+      resize: none;
+      outline: none;
+      box-sizing: border-box;
+      margin: 0;
+      border: 0;
+      width: 100%;
+      height: 100%;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 10px;
+      border-radius: 4px;
+      transition: background-color 0.5s ease;
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .note-container-inner textarea:focus {
+      background-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .note-header {
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    .note-form {
+      float: right;
+    }
+
+    .note-form button {
+      margin: 5px 20px 5px 0;
+      box-sizing: content-box;
+      padding: 4px 14px;
+      height: 16px;
+      border: 1px solid #999;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    .note-form button:focus {
+      outline: 0;
+      border: 2px solid #000;
+      padding: 3px 13px;
+    }
+
     .colors-button {
       margin-left: 16px;
       margin-right: 6px;
@@ -513,6 +615,21 @@ const renderElement = ({
         </form>
       </div>
     </div>
+    <a class="note-button" style="color: ${true ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translations.note}<span></span></a>
+    <div class="note">
+      <div class="note-header">${translations.note}</div>
+      <div class="note-container">
+        <div class="note-container-inner">
+          <textarea placeholder="${translations.notePlaceholder}"></textarea>
+        </div>
+      </div>
+      <div>
+        <a href="javascript:void(0);" class="logo note-close-button">X</a>
+        <form class="note-form">
+          <button>${translations.noteSave}</button>
+        </form>
+      </div>
+    </div>
     <div class="colors-button">
       <div class="colors-button-icon">
         <span></span>
@@ -599,10 +716,18 @@ const getElementParameters = (history, flags, currentDatetime, propertiesToCheck
   };
 };
 
-const setColorTheme = (root, color) => {
+const setColorState = (root, color) => {
   const theme = color && colors[color] ? colors[color] : colors.default;
 
   root.firstElementChild.style.setProperty('--meerkat-container-background', theme.containerBackground);
+};
+
+const setNoteState = (root, note) => {
+  const noteOpenButtonSpan = root.querySelector('.note-button span');
+  const isEmpty = note === undefined;
+
+  noteOpenButtonSpan.style.display = isEmpty ? 'none' : 'inline-block';
+  noteOpenButtonSpan.innerHTML = isEmpty ? '' : note;
 };
 
 const initToolbar = (
@@ -612,6 +737,7 @@ const initToolbar = (
   propertiesToCheck,
   stringToPrice,
   setColor,
+  setNote,
   addFlag,
   removeFlag,
   getFlags
@@ -620,7 +746,8 @@ const initToolbar = (
 
   root.innerHTML = renderElement(parameters).trim();
 
-  setColorTheme(root, item.color);
+  setColorState(root, item.color);
+  setNoteState(root, item.note);
 
   const element = root.firstElementChild;
   const changesOpenButton = element.querySelector('.changes-button');
@@ -635,9 +762,15 @@ const initToolbar = (
   const flagsAddStart = element.querySelector('.flags-add-start');
   const flagsAddInputs = element.querySelector('.flags-add-inputs');
   const flagsContainer = element.querySelector('.flags-container');
+  const noteOpenButton = element.querySelector('.note-button');
+  const noteCloseButton = element.querySelector('.note-close-button');
+  const note = element.querySelector('.note');
+  const noteForm = element.querySelector('.note-form');
+  const noteTextarea = element.querySelector('.note textarea');
 
   let isChangesClosed = true;
   let isFlagsClosed = true;
+  let isNoteClosed = true;
 
   const documentChangesClickHandler = (e) => {
     toggleChanges();
@@ -645,6 +778,10 @@ const initToolbar = (
 
   const documentFlagsClickHandler = (e) => {
     toggleFlags();
+  };
+
+  const documentNoteClickHandler = (e) => {
+    toggleNote();
   };
 
   const toggleChanges = () => {
@@ -685,6 +822,22 @@ const initToolbar = (
     }
   };
 
+  const toggleNote = () => {
+    isNoteClosed = !isNoteClosed;
+
+    note.style.height = isNoteClosed ? '0px' : '200px';
+    note.style.width = isNoteClosed ? '0px' : '500px';
+    note.style.opacity = isNoteClosed ? '0' : '1';
+
+    if (isNoteClosed) {
+      document.removeEventListener('mousedown', documentNoteClickHandler);
+    } else {
+      noteTextarea.value = item.note === undefined ? '' : item.note;
+
+      document.addEventListener('mousedown', documentNoteClickHandler);
+    }
+  };
+
   const colorsLeaveHandler = () => {
     colorsButton.removeEventListener('mouseleave', colorsLeaveHandler);
 
@@ -700,17 +853,18 @@ const initToolbar = (
   const colorsColorClickHandler = (e) => {
     colorsLeaveHandler();
 
-    const color = e.target.getAttribute('data-color-key');
+    const colorAttribute = e.target.getAttribute('data-color-key');
+    const color = colorAttribute === 'default' ? null : colorAttribute;
 
-    setColor(item, color === 'default' ? null : color);
+    setColor(item, color);
 
-    if (color === 'default') {
+    if (color === null) {
       delete item.color;
     } else {
       item.color = color;
     }
 
-    setColorTheme(root, item.color);
+    setColorState(root, item.color);
   };
 
   changesOpenButton.addEventListener('click', toggleChanges);
@@ -718,6 +872,9 @@ const initToolbar = (
 
   flagsOpenButton.addEventListener('click', toggleFlags);
   flagsCloseButton.addEventListener('click', toggleFlags);
+
+  noteOpenButton.addEventListener('click', toggleNote);
+  noteCloseButton.addEventListener('click', toggleNote);
 
   colorsButton.addEventListener('mouseenter', colorsHandler);
 
@@ -737,7 +894,7 @@ const initToolbar = (
     showFlagInputs(flagsAddStart, flagsAddInputs, true);
   });
 
-  flagsAddForm.addEventListener( 'submit', (e) => {
+  flagsAddForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const call = async () => {
@@ -762,6 +919,24 @@ const initToolbar = (
     };
 
     call();
+  });
+
+  noteForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const note = noteTextarea.value === '' ? null : noteTextarea.value;
+
+    setNote(item, note);
+
+    if (note === null) {
+      delete item.note;
+    } else {
+      item.note = note;
+    }
+
+    setNoteState(root, item.note);
+
+    toggleNote();
   });
 };
 

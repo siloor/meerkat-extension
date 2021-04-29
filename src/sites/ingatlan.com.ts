@@ -2,7 +2,7 @@ import { BASE_PROPERTIES, SERVICES, PROPERTY_TYPES } from '../constants';
 import { textContentWithSeparator, removeUnnecessaryWhitespace } from '../utils';
 import { getTranslations } from '../translations';
 import { getToolbar } from '../dic';
-import { callService, addCustomFont, setColor, addFlag, removeFlag, getFlags } from '../sites-common';
+import { callService, addCustomFont, setColor, setNote, addFlag, removeFlag, getFlags } from '../sites-common';
 
 const NAMESPACE = 'ingatlan.com';
 
@@ -110,6 +110,7 @@ const start = async () => {
       propertiesToCheck,
       stringToPrice,
       setColor(NAMESPACE),
+      setNote(NAMESPACE),
       addFlag(NAMESPACE),
       removeFlag(NAMESPACE),
       getFlags(NAMESPACE)
