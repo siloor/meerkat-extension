@@ -1,4 +1,4 @@
-## Meerkat - For a Transparent Market
+## Meerkat - Market Notes
 
 Meerkat gives you tools to make better decisions about buying things from online marketplaces.
 

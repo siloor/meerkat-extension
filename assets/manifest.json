@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name": "Meerkat - For a Transparent Market",
+  "name": "Meerkat - Market Notes",
   "version": "__VERSION__",
   "background": {
     "scripts": ["background.js"]

@@ -1,3 +1,8 @@
+## 0.0.10
+
+* Added note feature
+* Removed tags feature
+
 ## 0.0.9
 
 * Added immobilienscout24.de support

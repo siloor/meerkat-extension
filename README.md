@@ -1,4 +1,4 @@
-# Meerkat - For a Transparent Market Extension
+# Meerkat Extension
 
 Build the project
 ```bash
