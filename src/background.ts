@@ -29,18 +29,9 @@ const getIsNewState = (lastSavedItem, item, propertiesToCheck) => {
   return false;
 };
 
-const getListData = async (token, namespace, items) => {
-  const params = new URLSearchParams();
-
-  params.append('token', token);
-  params.append('namespace', namespace);
-
-  for (const item of items) {
-    params.append('items[]', item[BASE_PROPERTIES.ID]);
-  }
-
+const getCurrentDatetime = async () => {
   try {
-    const response = await fetch(`https://siloor.com/meerkat/api/list?${params}`);
+    const response = await fetch('https://siloor.com/meerkat/api/current_datetime');
     const data = await response.json();
 
     return {
@@ -141,8 +132,8 @@ const getSiteScript = (url) => {
   return site ? site.js[0] : null;
 };
 
-const getList = async (sendResponse, token, namespace, propertiesToCheck, version, items) => {
-  const { currentDatetime } = await getListData(token, namespace, items);
+const getList = async (sendResponse, namespace, propertiesToCheck, version, items) => {
+  const { currentDatetime } = await getCurrentDatetime();
   const timestamp = currentDatetime.getTime();
 
   const originalOrder = items.map(item => item[BASE_PROPERTIES.ID]);
@@ -293,7 +284,7 @@ chrome.runtime.onMessage.addListener(
     if (request.message === SERVICES.GET_LIST) {
       sendEvent('extension', 'getList', request.namespace);
 
-      getList(sendResponse, token, request.namespace, request.propertiesToCheck, request.version, request.items);
+      getList(sendResponse, request.namespace, request.propertiesToCheck, request.version, request.items);
 
       return true;
     } else if (request.message === SERVICES.GET_NAMESPACES_INFO) {
