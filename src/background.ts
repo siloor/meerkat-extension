@@ -3,8 +3,6 @@ import { initAnalytics, sendEvent } from './analytics';
 import { storage } from './storage';
 import config from './config';
 
-let token = null;
-
 const getItemStorageKey = (namespace, id) => {
   return `item_${namespace}_${id}`;
 };
@@ -66,36 +64,27 @@ const migrate1to2 = async () => {
   await storage.set(newItems);
 };
 
-const generateRandomString = (length) => {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-
-  return result;
-};
-
-const setToken = async () => {
-  const result = await storage.get('token');
-
-  if (result.token) {
-    token = result.token;
-  } else {
-    token = generateRandomString(40);
-
-    await storage.set({ token: token });
-  }
+const migrate2to3 = async () => {
+  await storage.remove('token');
 };
 
 const migrate = async () => {
-  const version = await getStoreVersion();
+  let version = await getStoreVersion();
 
   if (version === 1) {
     await migrate1to2();
 
     await setStoreVersion(2);
+
+    version = await getStoreVersion();
+  }
+
+  if (version === 2) {
+    await migrate2to3();
+
+    await setStoreVersion(3);
+
+    version = await getStoreVersion();
   }
 };
 
@@ -326,8 +315,6 @@ chrome.runtime.onMessage.addListener(
     }
   }
 );
-
-setToken();
 
 migrate();
 
