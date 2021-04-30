@@ -256,19 +256,21 @@ const renderElement = ({
 
     .note-button {
       margin-left: 16px;
+      color: rgba(0, 0, 0, 0.4);
     }
 
-    .note-button span {
-      background-color: #fff;
-      padding: 2px 5px;
-      border-radius: 10px;
-      margin-left: 8px;
+    .note-button:hover, .note-button.active {
+      color: rgba(0, 0, 0, 0.8);
+    }
+
+    .note-button span span {
       display: inline-block;
-      vertical-align: bottom;
+      vertical-align: text-bottom;
+      line-height: initial;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      max-width: 40px;
+      max-width: 60px;
     }
 
     .note-close-button {
@@ -444,7 +446,7 @@ const renderElement = ({
         <a href="javascript:void(0);" class="logo changes-close-button">X</a>
       </div>
     </div>
-    <a class="note-button" style="color: ${true ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translations.note}<span></span></a>
+    <a class="note-button" href="javascript:void(0);">${translations.note}<span></span></a>
     <div class="note">
       <div class="note-header">${translations.note}</div>
       <div class="note-container">
@@ -514,11 +516,13 @@ const setColorState = (element, color) => {
   element.style.setProperty('--meerkat-container-background', theme.containerBackground);
 };
 
-const setNoteState = (noteOpenButtonSpan, note) => {
+const setNoteState = (noteOpenButton, noteOpenButtonSpan, note) => {
   const isEmpty = note === undefined;
 
+  noteOpenButton.classList.toggle('active', !isEmpty);
+
   noteOpenButtonSpan.style.display = isEmpty ? 'none' : 'inline-block';
-  noteOpenButtonSpan.innerHTML = isEmpty ? '' : note;
+  noteOpenButtonSpan.innerHTML = isEmpty ? '' : `&nbsp;(<span>${note}</span>)`;
 };
 
 const initToolbar = (
@@ -548,7 +552,7 @@ const initToolbar = (
   const noteTextarea = element.querySelector('.note textarea');
 
   setColorState(element, item.color);
-  setNoteState(noteOpenButtonSpan, item.note);
+  setNoteState(noteOpenButton, noteOpenButtonSpan, item.note);
 
   let isChangesClosed = true;
   let isNoteClosed = true;
@@ -657,7 +661,7 @@ const initToolbar = (
       item.note = note;
     }
 
-    setNoteState(noteOpenButtonSpan, item.note);
+    setNoteState(noteOpenButton, noteOpenButtonSpan, item.note);
 
     toggleNote();
   });
