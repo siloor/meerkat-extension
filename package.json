@@ -8,6 +8,7 @@
     "build": "rollup -c --environment BUILD:production",
     "test": "jest",
     "coverage": "jest --collect-coverage",
+    "release": "node scripts/release.js",
     "generate-icons": "node scripts/generate-icons.js"
   },
   "author": "",
