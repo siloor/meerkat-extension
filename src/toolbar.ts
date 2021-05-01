@@ -2,6 +2,9 @@ import { diffHTML } from './Diffr';
 import { BASE_PROPERTIES, PROPERTY_TYPES } from './constants';
 import { setToolbar } from './dic';
 import { getTranslations } from './translations';
+import { toolbarCss } from './toolbar.css';
+
+const { html, render, useEffect } = window['htmPreact'];
 
 const colors = {
   default: {
@@ -101,327 +104,72 @@ const getTextDiff = (oldValue, value) => {
     .replace(/<del/g, '<del style="color: #ff4500;"');
 };
 
-const renderElement = ({
-  creationDate,
-  days,
-  priceDifference,
-  currency,
-  changes
-}) => {
-  const renderDiff = (oldValue, value, type) => {
-    if (type === PROPERTY_TYPES.TEXT) {
-      return getTextDiff(oldValue, value);
-    } else if (type === PROPERTY_TYPES.URL) {
-      return [
-        oldValue
-          ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldUrl}</a>`
-          : `<span style="text-decoration: line-through;">${translations.oldUrl}</span>`,
-        value
-          ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newUrl}</a>`
-          : `<span style="text-decoration: line-through;">${translations.newUrl}</span>`
-      ].join(' - ');
-    } else if (type === PROPERTY_TYPES.IMAGE) {
-      return [
-        oldValue
-          ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldImage}</a>`
-          : `<span style="text-decoration: line-through;">${translations.oldImage}</span>`,
-        value
-          ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newImage}</a>`
-          : `<span style="text-decoration: line-through;">${translations.newImage}</span>`
-      ].join(' - ');
-    }
-
-    return `<span style="color: #ff4500; text-decoration: line-through;">${oldValue}</span> <span style="color: #39b54a;">${value}</span>`;
-  };
-
-  const changesHTML = [];
-
-  for (const change of changes) {
-    changesHTML.push(`
-      <tr>
-        <td>${change.property.title}</td>
-        <td>${timestampToString(change.date)}</td>
-        <td>${renderDiff(change.oldValue, change.value, change.property.type)}</td>
-      </tr>
-    `);
+const renderDiff = (oldValue, value, type) => {
+  if (type === PROPERTY_TYPES.TEXT) {
+    return getTextDiff(oldValue, value);
+  } else if (type === PROPERTY_TYPES.URL) {
+    return [
+      oldValue
+        ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldUrl}</a>`
+        : `<span style="text-decoration: line-through;">${translations.oldUrl}</span>`,
+      value
+        ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newUrl}</a>`
+        : `<span style="text-decoration: line-through;">${translations.newUrl}</span>`
+    ].join(' - ');
+  } else if (type === PROPERTY_TYPES.IMAGE) {
+    return [
+      oldValue
+        ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldImage}</a>`
+        : `<span style="text-decoration: line-through;">${translations.oldImage}</span>`,
+      value
+        ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newImage}</a>`
+        : `<span style="text-decoration: line-through;">${translations.newImage}</span>`
+    ].join(' - ');
   }
 
-  const colorsHTML = [];
+  return `<span style="color: #ff4500; text-decoration: line-through;">${oldValue}</span> <span style="color: #39b54a;">${value}</span>`;
+};
 
-  for (const colorKey of Object.keys(colors)) {
-    colorsHTML.push(`
-      <a href="javascript:void(0);" class="colors-color-button" style="background-color: ${colors[colorKey].containerBackground}" title="${colorKey}" data-color-key="${colorKey}"></a>
-    `);
-  }
+const Toolbar = (props) => {
+  const {
+    root,
+    item,
+    currentDatetime,
+    propertiesToCheck,
+    stringToPrice,
+    setColor,
+    setNote
+  } = props;
+  const parameters = getElementParameters(item.history, currentDatetime, propertiesToCheck, stringToPrice);
 
-  return `
+  useEffect(() => {
+    startToolbar(
+      root,
+      item,
+      currentDatetime,
+      propertiesToCheck,
+      stringToPrice,
+      setColor,
+      setNote,
+      parameters
+    );
+
+    return () => {
+      // Optional: Any cleanup code
+    };
+  }, []);
+
+  const {
+    creationDate,
+    days,
+    priceDifference,
+    currency,
+    changes
+  } = parameters;
+
+  return html`
 <div>
-  <style>
-    a {
-      text-decoration: none;
-    }
-
-    .container {
-      position: relative;
-      float: left;
-      border-radius: 16px;
-      padding: 8px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);
-      font-family: 'Roboto', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 13px;
-      line-height: 17px;
-      background-color: var(--meerkat-container-background);
-    }
-
-    .logo {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      line-height: 20px;
-      border-radius: 10px;
-      text-align: center;
-      font-size: 13px;
-      font-weight: bold;
-      background-color: rgba(0, 0, 0, 0.15);
-      color: #fff;
-    }
-
-    .date {
-      margin-left: 16px;
-      color: rgba(0, 0, 0, 0.4);
-    }
-
-    .price-difference {
-      margin-left: 16px;
-    }
-
-    .changes-button {
-      margin-left: 16px;
-    }
-
-    .changes-close-button {
-      margin: 8px;
-    }
-
-    .changes {
-      position: absolute;
-      z-index: 1;
-      bottom: 0;
-      left: 0;
-      background: #eee;
-      width: 0;
-      height: 0;
-      opacity: 0;
-      border-radius: 16px;
-      overflow: hidden;
-      transition: width 0.2s, height 0.2s, opacity 0.2s;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .changes-container {
-      padding: 10px 10px 0 10px;
-      overflow: auto;
-      flex-grow: 1;
-    }
-
-    .changes-container-inner {
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-    }
-
-    .changes table {
-      table-layout: fixed;
-      width: 100%;
-      border-spacing: 0;
-    }
-
-    .changes table th {
-      padding: 8px;
-      position: sticky;
-      top: 0;
-      background: #eee;
-      box-shadow: inset 0 -1px 0 #bbb;
-      font-size: 14px;
-      color: #999;
-    }
-
-    .changes table td {
-      padding: 8px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .note-button {
-      margin-left: 16px;
-      color: rgba(0, 0, 0, 0.4);
-    }
-
-    .note-button:hover, .note-button.active {
-      color: rgba(0, 0, 0, 0.8);
-    }
-
-    .note-button span span {
-      display: inline-block;
-      vertical-align: text-bottom;
-      line-height: initial;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: 60px;
-    }
-
-    .note-close-button {
-      margin: 8px;
-    }
-
-    .note {
-      position: absolute;
-      z-index: 1;
-      bottom: 0;
-      left: 0;
-      background: #eee;
-      width: 0;
-      height: 0;
-      opacity: 0;
-      border-radius: 16px;
-      overflow: hidden;
-      transition: width 0.2s, height 0.2s, opacity 0.2s;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .note-container {
-      padding: 0 10px 0 10px;
-      overflow: auto;
-      flex-grow: 1;
-    }
-
-    .note-container-inner {
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-    }
-
-    .note-container-inner textarea {
-      display: block;
-      resize: none;
-      outline: none;
-      box-sizing: border-box;
-      margin: 0;
-      border: 0;
-      width: 100%;
-      height: 100%;
-      font-family: inherit;
-      font-size: 13px;
-      padding: 10px;
-      border-radius: 4px;
-      transition: background-color 0.5s ease;
-      background-color: rgba(0, 0, 0, 0.1);
-    }
-
-    .note-container-inner textarea:focus {
-      background-color: rgba(255, 255, 255, 0.6);
-    }
-
-    .note-header {
-      padding: 10px;
-      font-size: 14px;
-    }
-
-    .note-form {
-      float: right;
-    }
-
-    .note-form button {
-      margin: 5px 20px 5px 0;
-      box-sizing: content-box;
-      padding: 4px 14px;
-      height: 16px;
-      border: 1px solid #999;
-      border-radius: 4px;
-      font-size: 13px;
-    }
-
-    .note-form button:focus {
-      outline: 0;
-      border: 2px solid #000;
-      padding: 3px 13px;
-    }
-
-    .colors-button {
-      margin-left: 16px;
-      margin-right: 6px;
-      float: right;
-      position: relative;
-      opacity: 0.5;
-    }
-
-    .colors-button.open {
-      opacity: 1;
-    }
-
-    .colors-button-icon {
-      width: 20px;
-      height: 20px;
-      box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
-      border-radius: 10px;
-    }
-
-    .colors-button-icon span {
-      display: block;
-      float: left;
-      width: 10px;
-      height: 10px;
-    }
-
-    .colors-button-icon span:nth-child(1) {
-      border-top-left-radius: 10px;
-      background: #f86b43;
-    }
-
-    .colors-button-icon span:nth-child(2) {
-      border-top-right-radius: 10px;
-      background: #92c523;
-    }
-
-    .colors-button-icon span:nth-child(3) {
-      border-bottom-left-radius: 10px;
-      background: #01b6f1;
-    }
-
-    .colors-button-icon span:nth-child(4) {
-      border-bottom-right-radius: 10px;
-      background: #ffc644;
-    }
-
-    .colors-container {
-      display: none;
-      position: absolute;
-      bottom: 20px;
-      left: 0;
-      width: 168px;
-      height: 60px;
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 10px;
-    }
-
-    .colors-button.open .colors-container {
-      display: block;
-    }
-
-    .colors-color-button {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
-      border-radius: 10px;
-      margin: 4px;
-    }
-  </style>
+  <style>${toolbarCss}</style>
   <div class="container">
     <span class="logo">M</span>
     <span class="date" title="${translations.firstSaw}: ${timestampToString(creationDate)}">${days} ${translations.daysAgo}</span>
@@ -437,7 +185,13 @@ const renderElement = ({
               <th>${translations.changesLabelValue}</th>
             </thead>
             <tbody>
-              ${changesHTML.map(html => html.trim()).join('')}
+              ${changes.map(change => html`
+                <tr>
+                  <td>${change.property.title}</td>
+                  <td>${timestampToString(change.date)}</td>
+                  <td dangerouslySetInnerHTML="${{ __html : renderDiff(change.oldValue, change.value, change.property.type) }}"></td>
+                </tr>
+              `)}
             </tbody>
           </table>
         </div>
@@ -469,7 +223,9 @@ const renderElement = ({
         <span></span>
       </div>
       <div class="colors-container">
-        ${colorsHTML.map(html => html.trim()).join('')}
+        ${Object.keys(colors).map(colorKey => html`
+          <a href="javascript:void(0);" class="colors-color-button" style="background-color: ${colors[colorKey].containerBackground}" title="${colorKey}" data-color-key="${colorKey}"></a>
+        `)}
       </div>
     </div>
   </div>
@@ -534,10 +290,29 @@ const initToolbar = (
   setColor,
   setNote
 ) => {
-  const parameters = getElementParameters(item.history, currentDatetime, propertiesToCheck, stringToPrice);
+  const props = {
+    root,
+    item,
+    currentDatetime,
+    propertiesToCheck,
+    stringToPrice,
+    setColor,
+    setNote
+  };
 
-  root.innerHTML = renderElement(parameters).trim();
+  render(html`<${Toolbar} ...${props} />`, root);
+};
 
+const startToolbar = (
+  root,
+  item,
+  currentDatetime,
+  propertiesToCheck,
+  stringToPrice,
+  setColor,
+  setNote,
+  parameters
+) => {
   const element = root.firstElementChild;
   const changesOpenButton = element.querySelector('.changes-button');
   const changesCloseButton = element.querySelector('.changes-close-button');

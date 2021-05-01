@@ -296,19 +296,11 @@ chrome.runtime.onMessage.addListener(
       const siteScript = getSiteScript(sender.url);
 
       if (siteScript) {
-        chrome.tabs.executeScript(
-          sender.tab.id,
-          {
-            file: 'toolbar.js'
-          }
-        );
+        const scripts = ['htm-preact-3.0.4-standalone.umd.js', 'toolbar.js', siteScript];
 
-        chrome.tabs.executeScript(
-          sender.tab.id,
-          {
-            file: siteScript
-          }
-        );
+        for (const script of scripts) {
+          chrome.tabs.executeScript(sender.tab.id, { file: script });
+        }
       }
 
       return true;
