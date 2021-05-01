@@ -4,7 +4,7 @@ import { setToolbar } from './dic';
 import { getTranslations } from './translations';
 import { toolbarCss } from './toolbar.css';
 
-const { html, render, useEffect } = window['htmPreact'];
+const { html, render, useEffect, useState, useRef } = window['htmPreact'];
 
 const colors = {
   default: {
@@ -142,6 +142,9 @@ const Toolbar = (props) => {
   } = props;
   const parameters = getElementParameters(item.history, currentDatetime, propertiesToCheck, stringToPrice);
 
+  const [isChangesClosed, setIsChangesClosed] = useState(true);
+  const documentChangesClickHandlerRef = useRef(null);
+
   useEffect(() => {
     startToolbar(
       root,
@@ -150,14 +153,31 @@ const Toolbar = (props) => {
       propertiesToCheck,
       stringToPrice,
       setColor,
-      setNote,
-      parameters
+      setNote
     );
 
     return () => {
       // Optional: Any cleanup code
     };
   }, []);
+
+  const closeChanges = () => {
+    document.removeEventListener('mousedown', documentChangesClickHandlerRef.current);
+
+    setIsChangesClosed(true);
+  };
+
+  const openChanges = () => {
+    if (parameters.changes.length === 0) {
+      return;
+    }
+
+    documentChangesClickHandlerRef.current = closeChanges;
+
+    document.addEventListener('mousedown', documentChangesClickHandlerRef.current);
+
+    setIsChangesClosed(false);
+  };
 
   const {
     creationDate,
@@ -174,8 +194,8 @@ const Toolbar = (props) => {
     <span class="logo">M</span>
     <span class="date" title="${translations.firstSaw}: ${timestampToString(creationDate)}">${days} ${translations.daysAgo}</span>
     <span class="price-difference" style="font-weight: ${priceDifference === 0 || priceDifference === null ? 'normal' : 'bold'}; color: ${priceDifference === 0 || priceDifference === null ? 'rgba(0, 0, 0, 0.4)' : (priceDifference > 0 ? '#ff4500' : '#39b54a')};" title="${translations.priceChange}">${priceDifference > 0 ? '+' : ''}${numberToString(priceDifference)}${currency === null ? '' : ` ${currency}`}</span>
-    <a class="changes-button" style="color: ${changes.length > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);">${translations.changes} (${changes.length})</a>
-    <div class="changes">
+    <a class="changes-button" style="color: ${changes.length > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);" onClick=${openChanges}>${translations.changes} (${changes.length})</a>
+    <div class="changes" style="width: ${isChangesClosed ? '0px' : '500px'}; height: ${isChangesClosed ? '0px' : '200px'}; opacity: ${isChangesClosed ? '0' : '1'};">
       <div class="changes-container">
         <div class="changes-container-inner">
           <table>
@@ -197,7 +217,7 @@ const Toolbar = (props) => {
         </div>
       </div>
       <div>
-        <a href="javascript:void(0);" class="logo changes-close-button">X</a>
+        <a href="javascript:void(0);" class="logo changes-close-button" onClick=${closeChanges}>X</a>
       </div>
     </div>
     <a class="note-button" href="javascript:void(0);">${translations.note}<span></span></a>
@@ -310,13 +330,9 @@ const startToolbar = (
   propertiesToCheck,
   stringToPrice,
   setColor,
-  setNote,
-  parameters
+  setNote
 ) => {
   const element = root.firstElementChild;
-  const changesOpenButton = element.querySelector('.changes-button');
-  const changesCloseButton = element.querySelector('.changes-close-button');
-  const changes = element.querySelector('.changes');
   const colorsButton = element.querySelector('.colors-button');
   const colorsColorButtons = element.querySelectorAll('.colors-color-button');
   const noteOpenButton = element.querySelector('.note-button');
@@ -329,33 +345,10 @@ const startToolbar = (
   setColorState(element, item.color);
   setNoteState(noteOpenButton, noteOpenButtonSpan, item.note);
 
-  let isChangesClosed = true;
   let isNoteClosed = true;
-
-  const documentChangesClickHandler = (e) => {
-    toggleChanges();
-  };
 
   const documentNoteClickHandler = (e) => {
     toggleNote();
-  };
-
-  const toggleChanges = () => {
-    if (parameters.changes.length === 0) {
-      return;
-    }
-
-    isChangesClosed = !isChangesClosed;
-
-    changes.style.height = isChangesClosed ? '0px' : '200px';
-    changes.style.width = isChangesClosed ? '0px' : '500px';
-    changes.style.opacity = isChangesClosed ? '0' : '1';
-
-    if (isChangesClosed) {
-      document.removeEventListener('mousedown', documentChangesClickHandler);
-    } else {
-      document.addEventListener('mousedown', documentChangesClickHandler);
-    }
   };
 
   const toggleNote = () => {
@@ -402,9 +395,6 @@ const startToolbar = (
 
     setColorState(element, item.color);
   };
-
-  changesOpenButton.addEventListener('click', toggleChanges);
-  changesCloseButton.addEventListener('click', toggleChanges);
 
   noteOpenButton.addEventListener('click', toggleNote);
   noteCloseButton.addEventListener('click', toggleNote);
