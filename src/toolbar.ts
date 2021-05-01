@@ -104,30 +104,30 @@ const getTextDiff = (oldValue, value) => {
     .replace(/<del/g, '<del style="color: #ff4500;"');
 };
 
+const renderDiffText = (oldValue, value) => {
+  return html`<span dangerouslySetInnerHTML="${{ __html : getTextDiff(oldValue, value) }}"></span>`;
+};
+
+const renderDiffLinkValue = (value, isOld, placeholder) => {
+  return value
+    ? html`<a href="${value}" target="_blank" style="color: ${isOld ? '#ff4500' : '#39b54a'};">${placeholder}</a>`
+    : html`<span style="text-decoration: line-through;">${placeholder}</span>`;
+};
+
+const renderDiffLink = (oldValue, oldPlaceholder, value, placeholder) => {
+  return html`${renderDiffLinkValue(oldValue, true, oldPlaceholder)} - ${renderDiffLinkValue(value, false, placeholder)}`;
+};
+
 const renderDiff = (oldValue, value, type) => {
   if (type === PROPERTY_TYPES.TEXT) {
-    return getTextDiff(oldValue, value);
+    return renderDiffText(oldValue, value);
   } else if (type === PROPERTY_TYPES.URL) {
-    return [
-      oldValue
-        ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldUrl}</a>`
-        : `<span style="text-decoration: line-through;">${translations.oldUrl}</span>`,
-      value
-        ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newUrl}</a>`
-        : `<span style="text-decoration: line-through;">${translations.newUrl}</span>`
-    ].join(' - ');
+    return renderDiffLink(oldValue, translations.oldUrl, value, translations.newUrl);
   } else if (type === PROPERTY_TYPES.IMAGE) {
-    return [
-      oldValue
-        ? `<a href="${oldValue || ''}" target="_blank" style="color: #ff4500;">${translations.oldImage}</a>`
-        : `<span style="text-decoration: line-through;">${translations.oldImage}</span>`,
-      value
-        ? `<a href="${value || ''}" target="_blank" style="color: #39b54a;">${translations.newImage}</a>`
-        : `<span style="text-decoration: line-through;">${translations.newImage}</span>`
-    ].join(' - ');
+    return renderDiffLink(oldValue, translations.oldImage, value, translations.newImage);
   }
 
-  return `<span style="color: #ff4500; text-decoration: line-through;">${oldValue}</span> <span style="color: #39b54a;">${value}</span>`;
+  return html`<span style="color: #ff4500; text-decoration: line-through;">${oldValue}</span> <span style="color: #39b54a;">${value}</span>`;
 };
 
 const Toolbar = (props) => {
@@ -189,7 +189,7 @@ const Toolbar = (props) => {
                 <tr>
                   <td>${change.property.title}</td>
                   <td>${timestampToString(change.date)}</td>
-                  <td dangerouslySetInnerHTML="${{ __html : renderDiff(change.oldValue, change.value, change.property.type) }}"></td>
+                  <td>${renderDiff(change.oldValue, change.value, change.property.type)}</td>
                 </tr>
               `)}
             </tbody>
