@@ -4,7 +4,7 @@ import { setToolbar } from './dic';
 import { getTranslations } from './translations';
 import { toolbarCss } from './toolbar.css';
 
-const { html, render, useEffect, useState, useRef } = window['htmPreact'];
+const { html, render, useState, useRef } = window['htmPreact'];
 
 const colors = {
   default: {
@@ -130,9 +130,41 @@ const renderDiff = (oldValue, value, type) => {
   return html`<span style="color: #ff4500; text-decoration: line-through;">${oldValue}</span> <span style="color: #39b54a;">${value}</span>`;
 };
 
+const getElementParameters = (history, currentDatetime, propertiesToCheck, stringToPrice) => {
+  const oldPrice = stringToPrice(history[0].price);
+  const newPrice = stringToPrice(history[history.length - 1].price);
+
+  const changes = [];
+
+  for (let i = 1; i < history.length; i++) {
+    for (const property of propertiesToCheck) {
+      const value = history[i][property.name];
+      const oldValue = history[i - 1][property.name];
+
+      if (value === oldValue) {
+        continue;
+      }
+
+      changes.push({
+        property: property,
+        date: history[i][BASE_PROPERTIES.CREATED_TIMESTAMP],
+        value: value,
+        oldValue: oldValue
+      });
+    }
+  }
+
+  return {
+    creationDate: history[0][BASE_PROPERTIES.CREATED_TIMESTAMP],
+    days: Math.round(((new Date(currentDatetime)).getTime() - history[0][BASE_PROPERTIES.CREATED_TIMESTAMP]) / (1000 * 60 * 60 * 24)),
+    priceDifference: oldPrice.value === null && newPrice.value === null ? null : newPrice.value - oldPrice.value,
+    currency: oldPrice.currency === null ? newPrice.currency : oldPrice.currency,
+    changes
+  };
+};
+
 const Toolbar = (props) => {
   const {
-    root,
     item,
     currentDatetime,
     propertiesToCheck,
@@ -150,20 +182,14 @@ const Toolbar = (props) => {
   const noteTextareaRef = useRef(null);
   const [savedNote, setSavedNote] = useState(item.note);
 
-  useEffect(() => {
-    startToolbar(
-      root,
-      item,
-      currentDatetime,
-      propertiesToCheck,
-      stringToPrice,
-      setColor
-    );
+  const getContainerBackground = (color) => {
+    const theme = color && colors[color] ? colors[color] : colors.default;
 
-    return () => {
-      // Optional: Any cleanup code
-    };
-  }, []);
+    return theme.containerBackground;
+  };
+
+  const [isColorsClosed, setIsColorsClosed] = useState(true);
+  const [selectedColor, setSelectedColor] = useState(getContainerBackground(item.color));
 
   const closeChanges = () => {
     document.removeEventListener('mousedown', documentChangesClickHandlerRef.current);
@@ -221,6 +247,30 @@ const Toolbar = (props) => {
     closeNote();
   };
 
+  const openColors = () => {
+    setIsColorsClosed(false);
+  };
+
+  const closeColors = () => {
+    setIsColorsClosed(true);
+  };
+
+  const selectColor = (e) => {
+    const colorAttribute = e.currentTarget.getAttribute('data-color-key');
+    const color = colorAttribute === 'default' ? null : colorAttribute;
+
+    setColor(item, color);
+
+    if (color === null) {
+      delete item.color;
+    } else {
+      item.color = color;
+    }
+
+    setIsColorsClosed(true);
+    setSelectedColor(getContainerBackground(item.color));
+  };
+
   const {
     creationDate,
     days,
@@ -230,7 +280,7 @@ const Toolbar = (props) => {
   } = parameters;
 
   return html`
-<div>
+<div style="--meerkat-container-background: ${selectedColor};">
   <style>${toolbarCss}</style>
   <div class="container">
     <span class="logo">M</span>
@@ -283,7 +333,7 @@ const Toolbar = (props) => {
         </form>
       </div>
     </div>
-    <div class="colors-button">
+    <div class="colors-button ${isColorsClosed ? '' : 'open'}" onMouseEnter=${openColors} onMouseLeave=${closeColors}>
       <div class="colors-button-icon">
         <span></span>
         <span></span>
@@ -298,6 +348,7 @@ const Toolbar = (props) => {
             style="background-color: ${colors[colorKey].containerBackground}"
             title="${colorKey}"
             data-color-key="${colorKey}"
+            onClick=${selectColor}
           ></a>
         `)}
       </div>
@@ -305,45 +356,6 @@ const Toolbar = (props) => {
   </div>
 </div>
 `;
-};
-
-const getElementParameters = (history, currentDatetime, propertiesToCheck, stringToPrice) => {
-  const oldPrice = stringToPrice(history[0].price);
-  const newPrice = stringToPrice(history[history.length - 1].price);
-
-  const changes = [];
-
-  for (let i = 1; i < history.length; i++) {
-    for (const property of propertiesToCheck) {
-      const value = history[i][property.name];
-      const oldValue = history[i - 1][property.name];
-
-      if (value === oldValue) {
-        continue;
-      }
-
-      changes.push({
-        property: property,
-        date: history[i][BASE_PROPERTIES.CREATED_TIMESTAMP],
-        value: value,
-        oldValue: oldValue
-      });
-    }
-  }
-
-  return {
-    creationDate: history[0][BASE_PROPERTIES.CREATED_TIMESTAMP],
-    days: Math.round(((new Date(currentDatetime)).getTime() - history[0][BASE_PROPERTIES.CREATED_TIMESTAMP]) / (1000 * 60 * 60 * 24)),
-    priceDifference: oldPrice.value === null && newPrice.value === null ? null : newPrice.value - oldPrice.value,
-    currency: oldPrice.currency === null ? newPrice.currency : oldPrice.currency,
-    changes
-  };
-};
-
-const setColorState = (element, color) => {
-  const theme = color && colors[color] ? colors[color] : colors.default;
-
-  element.style.setProperty('--meerkat-container-background', theme.containerBackground);
 };
 
 const initToolbar = (
@@ -355,8 +367,15 @@ const initToolbar = (
   setColor,
   setNote
 ) => {
+  root.addEventListener( 'mousedown', (e) => {
+    e.stopPropagation();
+  });
+
+  root.addEventListener( 'keydown', (e) => {
+    e.stopPropagation();
+  });
+
   const props = {
-    root,
     item,
     currentDatetime,
     propertiesToCheck,
@@ -366,64 +385,6 @@ const initToolbar = (
   };
 
   render(html`<${Toolbar} ...${props} />`, root);
-};
-
-const startToolbar = (
-  root,
-  item,
-  currentDatetime,
-  propertiesToCheck,
-  stringToPrice,
-  setColor
-) => {
-  const element = root.firstElementChild;
-  const colorsButton = element.querySelector('.colors-button');
-  const colorsColorButtons = element.querySelectorAll('.colors-color-button');
-
-  setColorState(element, item.color);
-
-  const colorsLeaveHandler = () => {
-    colorsButton.removeEventListener('mouseleave', colorsLeaveHandler);
-
-    colorsButton.classList.remove('open');
-  };
-
-  const colorsHandler = (e) => {
-    colorsButton.addEventListener('mouseleave', colorsLeaveHandler);
-
-    colorsButton.classList.add('open');
-  };
-
-  const colorsColorClickHandler = (e) => {
-    colorsLeaveHandler();
-
-    const colorAttribute = e.target.getAttribute('data-color-key');
-    const color = colorAttribute === 'default' ? null : colorAttribute;
-
-    setColor(item, color);
-
-    if (color === null) {
-      delete item.color;
-    } else {
-      item.color = color;
-    }
-
-    setColorState(element, item.color);
-  };
-
-  colorsButton.addEventListener('mouseenter', colorsHandler);
-
-  for (const colorsColorButton of colorsColorButtons) {
-    colorsColorButton.addEventListener('click', colorsColorClickHandler);
-  }
-
-  root.addEventListener( 'mousedown', (e) => {
-    e.stopPropagation();
-  });
-
-  root.addEventListener( 'keydown', (e) => {
-    e.stopPropagation();
-  });
 };
 
 setToolbar({
