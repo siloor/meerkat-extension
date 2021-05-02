@@ -105,7 +105,7 @@ a {
   color: rgba(0, 0, 0, 0.8);
 }
 
-.note-button span span {
+.note-button span {
   display: inline-block;
   vertical-align: text-bottom;
   line-height: initial;

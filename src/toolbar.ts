@@ -145,6 +145,11 @@ const Toolbar = (props) => {
   const [isChangesClosed, setIsChangesClosed] = useState(true);
   const documentChangesClickHandlerRef = useRef(null);
 
+  const [isNoteClosed, setIsNoteClosed] = useState(true);
+  const documentNoteClickHandlerRef = useRef(null);
+  const noteTextareaRef = useRef(null);
+  const [savedNote, setSavedNote] = useState(item.note);
+
   useEffect(() => {
     startToolbar(
       root,
@@ -152,8 +157,7 @@ const Toolbar = (props) => {
       currentDatetime,
       propertiesToCheck,
       stringToPrice,
-      setColor,
-      setNote
+      setColor
     );
 
     return () => {
@@ -163,6 +167,8 @@ const Toolbar = (props) => {
 
   const closeChanges = () => {
     document.removeEventListener('mousedown', documentChangesClickHandlerRef.current);
+
+    documentChangesClickHandlerRef.current = null;
 
     setIsChangesClosed(true);
   };
@@ -177,6 +183,42 @@ const Toolbar = (props) => {
     document.addEventListener('mousedown', documentChangesClickHandlerRef.current);
 
     setIsChangesClosed(false);
+  };
+
+  const closeNote = () => {
+    document.removeEventListener('mousedown', documentNoteClickHandlerRef.current);
+
+    documentNoteClickHandlerRef.current = null;
+
+    setIsNoteClosed(true);
+  };
+
+  const openNote = () => {
+    documentNoteClickHandlerRef.current = closeNote;
+
+    document.addEventListener('mousedown', documentNoteClickHandlerRef.current);
+
+    noteTextareaRef.current.value = item.note === undefined ? '' : item.note;
+
+    setIsNoteClosed(false);
+  };
+
+  const noteSubmitHandler = (e) => {
+    e.preventDefault();
+
+    const note = noteTextareaRef.current.value === '' ? null : noteTextareaRef.current.value;
+
+    setNote(item, note);
+
+    if (note === null) {
+      delete item.note;
+    } else {
+      item.note = note;
+    }
+
+    setSavedNote(item.note);
+
+    closeNote();
   };
 
   const {
@@ -195,7 +237,7 @@ const Toolbar = (props) => {
     <span class="date" title="${translations.firstSaw}: ${timestampToString(creationDate)}">${days} ${translations.daysAgo}</span>
     <span class="price-difference" style="font-weight: ${priceDifference === 0 || priceDifference === null ? 'normal' : 'bold'}; color: ${priceDifference === 0 || priceDifference === null ? 'rgba(0, 0, 0, 0.4)' : (priceDifference > 0 ? '#ff4500' : '#39b54a')};" title="${translations.priceChange}">${priceDifference > 0 ? '+' : ''}${numberToString(priceDifference)}${currency === null ? '' : ` ${currency}`}</span>
     <a class="changes-button" style="color: ${changes.length > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);" onClick=${openChanges}>${translations.changes} (${changes.length})</a>
-    <div class="changes" style="width: ${isChangesClosed ? '0px' : '500px'}; height: ${isChangesClosed ? '0px' : '200px'}; opacity: ${isChangesClosed ? '0' : '1'};">
+    <div class="changes" style="width: ${isChangesClosed ? '0' : '500px'}; height: ${isChangesClosed ? '0' : '200px'}; opacity: ${isChangesClosed ? '0' : '1'};">
       <div class="changes-container">
         <div class="changes-container-inner">
           <table>
@@ -220,17 +262,20 @@ const Toolbar = (props) => {
         <a href="javascript:void(0);" class="logo changes-close-button" onClick=${closeChanges}>X</a>
       </div>
     </div>
-    <a class="note-button" href="javascript:void(0);">${translations.note}<span></span></a>
-    <div class="note">
+    <a class="note-button ${savedNote === undefined ? '' : 'active'}" href="javascript:void(0);" onClick=${openNote}>
+      ${translations.note}
+      ${savedNote === undefined ? '' : html` (<span>${savedNote}</span>)`}
+    </a>
+    <div class="note" style="width: ${isNoteClosed ? '0' : '500px'}; height: ${isNoteClosed ? '0' : '200px'}; opacity: ${isNoteClosed ? '0' : '1'};">
       <div class="note-header">${translations.note}</div>
       <div class="note-container">
         <div class="note-container-inner">
-          <textarea placeholder="${translations.notePlaceholder}"></textarea>
+          <textarea ref=${noteTextareaRef} placeholder="${translations.notePlaceholder}"></textarea>
         </div>
       </div>
       <div>
-        <a href="javascript:void(0);" class="logo note-close-button">X</a>
-        <form class="note-form">
+        <a href="javascript:void(0);" class="logo note-close-button" onClick=${closeNote}>X</a>
+        <form class="note-form" onSubmit=${noteSubmitHandler}>
           <button>${translations.noteSave}</button>
         </form>
       </div>
@@ -292,15 +337,6 @@ const setColorState = (element, color) => {
   element.style.setProperty('--meerkat-container-background', theme.containerBackground);
 };
 
-const setNoteState = (noteOpenButton, noteOpenButtonSpan, note) => {
-  const isEmpty = note === undefined;
-
-  noteOpenButton.classList.toggle('active', !isEmpty);
-
-  noteOpenButtonSpan.style.display = isEmpty ? 'none' : 'inline-block';
-  noteOpenButtonSpan.innerHTML = isEmpty ? '' : `&nbsp;(<span>${note}</span>)`;
-};
-
 const initToolbar = (
   root,
   item,
@@ -329,43 +365,13 @@ const startToolbar = (
   currentDatetime,
   propertiesToCheck,
   stringToPrice,
-  setColor,
-  setNote
+  setColor
 ) => {
   const element = root.firstElementChild;
   const colorsButton = element.querySelector('.colors-button');
   const colorsColorButtons = element.querySelectorAll('.colors-color-button');
-  const noteOpenButton = element.querySelector('.note-button');
-  const noteOpenButtonSpan = element.querySelector('.note-button span');
-  const noteCloseButton = element.querySelector('.note-close-button');
-  const note = element.querySelector('.note');
-  const noteForm = element.querySelector('.note-form');
-  const noteTextarea = element.querySelector('.note textarea');
 
   setColorState(element, item.color);
-  setNoteState(noteOpenButton, noteOpenButtonSpan, item.note);
-
-  let isNoteClosed = true;
-
-  const documentNoteClickHandler = (e) => {
-    toggleNote();
-  };
-
-  const toggleNote = () => {
-    isNoteClosed = !isNoteClosed;
-
-    note.style.height = isNoteClosed ? '0px' : '200px';
-    note.style.width = isNoteClosed ? '0px' : '500px';
-    note.style.opacity = isNoteClosed ? '0' : '1';
-
-    if (isNoteClosed) {
-      document.removeEventListener('mousedown', documentNoteClickHandler);
-    } else {
-      noteTextarea.value = item.note === undefined ? '' : item.note;
-
-      document.addEventListener('mousedown', documentNoteClickHandler);
-    }
-  };
 
   const colorsLeaveHandler = () => {
     colorsButton.removeEventListener('mouseleave', colorsLeaveHandler);
@@ -396,9 +402,6 @@ const startToolbar = (
     setColorState(element, item.color);
   };
 
-  noteOpenButton.addEventListener('click', toggleNote);
-  noteCloseButton.addEventListener('click', toggleNote);
-
   colorsButton.addEventListener('mouseenter', colorsHandler);
 
   for (const colorsColorButton of colorsColorButtons) {
@@ -411,24 +414,6 @@ const startToolbar = (
 
   root.addEventListener( 'keydown', (e) => {
     e.stopPropagation();
-  });
-
-  noteForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const note = noteTextarea.value === '' ? null : noteTextarea.value;
-
-    setNote(item, note);
-
-    if (note === null) {
-      delete item.note;
-    } else {
-      item.note = note;
-    }
-
-    setNoteState(noteOpenButton, noteOpenButtonSpan, item.note);
-
-    toggleNote();
   });
 };
 
