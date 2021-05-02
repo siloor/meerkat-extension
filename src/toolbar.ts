@@ -235,9 +235,12 @@ const Toolbar = (props) => {
   <div class="container">
     <span class="logo">M</span>
     <span class="date" title="${translations.firstSaw}: ${timestampToString(creationDate)}">${days} ${translations.daysAgo}</span>
-    <span class="price-difference" style="font-weight: ${priceDifference === 0 || priceDifference === null ? 'normal' : 'bold'}; color: ${priceDifference === 0 || priceDifference === null ? 'rgba(0, 0, 0, 0.4)' : (priceDifference > 0 ? '#ff4500' : '#39b54a')};" title="${translations.priceChange}">${priceDifference > 0 ? '+' : ''}${numberToString(priceDifference)}${currency === null ? '' : ` ${currency}`}</span>
+    <span
+      class="price-difference ${priceDifference === 0 || priceDifference === null ? '' : `has-difference ${priceDifference < 0 ? 'good-difference' : ''}`}"
+      title="${translations.priceChange}"
+    >${priceDifference > 0 ? '+' : ''}${numberToString(priceDifference)}${currency === null ? '' : ` ${currency}`}</span>
     <a class="changes-button" style="color: ${changes.length > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);" onClick=${openChanges}>${translations.changes} (${changes.length})</a>
-    <div class="changes" style="width: ${isChangesClosed ? '0' : '500px'}; height: ${isChangesClosed ? '0' : '200px'}; opacity: ${isChangesClosed ? '0' : '1'};">
+    <div class="changes ${isChangesClosed ? '' : 'open'}">
       <div class="changes-container">
         <div class="changes-container-inner">
           <table>
@@ -264,9 +267,9 @@ const Toolbar = (props) => {
     </div>
     <a class="note-button ${savedNote === undefined ? '' : 'active'}" href="javascript:void(0);" onClick=${openNote}>
       ${translations.note}
-      ${savedNote === undefined ? '' : html` (<span>${savedNote}</span>)`}
+      ${savedNote !== undefined && html` (<span>${savedNote}</span>)`}
     </a>
-    <div class="note" style="width: ${isNoteClosed ? '0' : '500px'}; height: ${isNoteClosed ? '0' : '200px'}; opacity: ${isNoteClosed ? '0' : '1'};">
+    <div class="note ${isNoteClosed ? '' : 'open'}">
       <div class="note-header">${translations.note}</div>
       <div class="note-container">
         <div class="note-container-inner">
@@ -289,7 +292,13 @@ const Toolbar = (props) => {
       </div>
       <div class="colors-container">
         ${Object.keys(colors).map(colorKey => html`
-          <a href="javascript:void(0);" class="colors-color-button" style="background-color: ${colors[colorKey].containerBackground}" title="${colorKey}" data-color-key="${colorKey}"></a>
+          <a
+            href="javascript:void(0);"
+            class="colors-color-button"
+            style="background-color: ${colors[colorKey].containerBackground}"
+            title="${colorKey}"
+            data-color-key="${colorKey}"
+          ></a>
         `)}
       </div>
     </div>

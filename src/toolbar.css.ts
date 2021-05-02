@@ -35,6 +35,18 @@ a {
 
 .price-difference {
   margin-left: 16px;
+  font-weight: normal;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.price-difference.has-difference {
+  margin-left: 16px;
+  font-weight: bold;
+  color: #ff4500;
+}
+
+.price-difference.has-difference.good-difference {
+  color: #39b54a;
 }
 
 .changes-button {
@@ -60,6 +72,15 @@ a {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);
   display: flex;
   flex-direction: column;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.changes.open {
+  width: 500px;
+  height: 200px;
+  opacity: 1;
 }
 
 .changes-container {
@@ -134,6 +155,15 @@ a {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);
   display: flex;
   flex-direction: column;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.note.open {
+  width: 500px;
+  height: 200px;
+  opacity: 1;
 }
 
 .note-container {
