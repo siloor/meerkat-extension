@@ -51,6 +51,11 @@ a {
 
 .changes-button {
   margin-left: 16px;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.changes-button.active {
+  color: rgba(0, 0, 0, 0.8);
 }
 
 .changes-close-button {
@@ -72,9 +77,6 @@ a {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);
   display: flex;
   flex-direction: column;
-  width: 0;
-  height: 0;
-  opacity: 0;
 }
 
 .changes.open {
@@ -109,6 +111,14 @@ a {
   box-shadow: inset 0 -1px 0 #bbb;
   font-size: 14px;
   color: #999;
+}
+
+.changes .changes-type {
+  width: 70px;
+}
+
+.changes .changes-date {
+  width: 90px;
 }
 
 .changes table td {
@@ -155,9 +165,6 @@ a {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);
   display: flex;
   flex-direction: column;
-  width: 0;
-  height: 0;
-  opacity: 0;
 }
 
 .note.open {

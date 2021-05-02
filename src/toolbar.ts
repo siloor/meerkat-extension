@@ -173,8 +173,8 @@ const Toolbar = (props) => {
     setIsChangesClosed(true);
   };
 
-  const openChanges = () => {
-    if (parameters.changes.length === 0) {
+  const openChanges = (e) => {
+    if (!e.currentTarget.classList.contains('active')) {
       return;
     }
 
@@ -239,14 +239,14 @@ const Toolbar = (props) => {
       class="price-difference ${priceDifference === 0 || priceDifference === null ? '' : `has-difference ${priceDifference < 0 ? 'good-difference' : ''}`}"
       title="${translations.priceChange}"
     >${priceDifference > 0 ? '+' : ''}${numberToString(priceDifference)}${currency === null ? '' : ` ${currency}`}</span>
-    <a class="changes-button" style="color: ${changes.length > 0 ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)'};" href="javascript:void(0);" onClick=${openChanges}>${translations.changes} (${changes.length})</a>
+    <a class="changes-button ${changes.length > 0 ? 'active' : ''}" href="javascript:void(0);" onClick=${openChanges}>${translations.changes} (${changes.length})</a>
     <div class="changes ${isChangesClosed ? '' : 'open'}">
       <div class="changes-container">
         <div class="changes-container-inner">
           <table>
             <thead>
-              <th style="width: 70px;">${translations.changesLabelType}</th>
-              <th style="width: 90px;">${translations.changesLabelDate}</th>
+              <th class="changes-type">${translations.changesLabelType}</th>
+              <th class="changes-date">${translations.changesLabelDate}</th>
               <th>${translations.changesLabelValue}</th>
             </thead>
             <tbody>
