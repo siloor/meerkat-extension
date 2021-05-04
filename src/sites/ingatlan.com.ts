@@ -76,7 +76,7 @@ const stringToPrice = (price) => {
   }
 
   return {
-    value: parseFloat(price.replace(/(?!-)[^0-9.]/g, '')) * (isMillion ? 1000000 : 1),
+    value: Math.round(parseFloat(price.replace(/(?!-)[^0-9.]/g, '')) * (isMillion ? 1000000 : 1)),
     currency: removeUnnecessaryWhitespace(price.replace(/[0-9.-]/g, ''))
   };
 };
