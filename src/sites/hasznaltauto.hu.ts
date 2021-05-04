@@ -1,8 +1,7 @@
 import { BASE_PROPERTIES, SERVICES, PROPERTY_TYPES } from '../constants';
-import { textContentWithSeparator, removeUnnecessaryWhitespace } from '../utils';
 import { getTranslations } from '../translations';
 import { getToolbar } from '../dic';
-import { callService, addCustomFont, setColor, setNote } from '../sites-common';
+import { callService, addCustomFont, setColor, setNote, textContentWithSeparator, removeUnnecessaryWhitespace } from '../sites-common';
 
 const NAMESPACE = 'hasznaltauto.hu';
 
