@@ -315,10 +315,14 @@ initAnalytics();
 if (config.buildEnv === 'production') {
   chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason === 'install') {
+      sendEvent('extension', 'installed', 'installed');
+
       chrome.tabs.create({
         url: 'https://siloor.github.io/meerkat-extension/installed/'
       });
     } else if (details.reason === 'update') {
+      sendEvent('extension', 'upgraded', 'upgraded');
+
       chrome.tabs.create({
         url: 'https://siloor.github.io/meerkat-extension/upgraded/'
       });
