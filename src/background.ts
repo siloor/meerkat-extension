@@ -91,11 +91,11 @@ const migrate = async () => {
 const getSiteScript = (url) => {
   const sites = [
     {
-      matches: ['.*://.*\\.hasznaltauto\\.hu/.*'],
+      matches: ['.*://(.*\\.)?hasznaltauto\\.hu/.*'],
       js: ['sites/hasznaltauto.hu.js']
     },
     {
-      matches: ['.*://.*\\.ingatlan\\.com/.*'],
+      matches: ['.*://(.*\\.)?ingatlan\\.com/.*'],
       js: ['sites/ingatlan.com.js']
     },
     {
