@@ -1,3 +1,7 @@
+## 0.0.11
+
+* Fixed ingatlan.com subdomain issue
+
 ## 0.0.10
 
 * Added note feature
