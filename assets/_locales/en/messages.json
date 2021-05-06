@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "Meerkat - Market Notes",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "Open source online marketplace assistant.",
+    "description": "Extension description"
+  }
+}

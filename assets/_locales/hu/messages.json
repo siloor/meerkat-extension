@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "Meerkat - Market Notes",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "Nyílt forráskódú online piactér segéd.",
+    "description": "Extension description"
+  }
+}

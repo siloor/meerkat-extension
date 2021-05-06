@@ -1,8 +1,8 @@
 const getLanguage = () => {
-  const language = window.navigator.language.split('-')[0];
   const allowedLanguages = ['en', 'hu'];
+  const languageIndex = allowedLanguages.indexOf(window.navigator.language.split('-')[0]);
 
-  return allowedLanguages.indexOf(language) === -1 ? 'en' : language;
+  return allowedLanguages[languageIndex === -1 ? 0 : languageIndex];
 };
 
 export const getTranslations = (translations) => {

@@ -1,3 +1,7 @@
+## 0.0.12
+
+* Add package internationalization
+
 ## 0.0.11
 
 * Fixed ingatlan.com subdomain issue

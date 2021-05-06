@@ -64,6 +64,7 @@ for (const input of inputs) {
 config[0].plugins.push(copy({
   targets: [
     { src: `assets/${production ? 'icons' : 'icons-dev'}/*`, dest: `${rootDir}/icons` },
+    { src: `assets/_locales/*`, dest: `${rootDir}/_locales` },
     { src: 'assets/options.html', dest: rootDir },
     { src: 'assets/htm-preact-3.0.4-standalone.umd.js', dest: rootDir },
     {
