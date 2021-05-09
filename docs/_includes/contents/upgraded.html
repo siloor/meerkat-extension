@@ -1,5 +1,5 @@
 {% capture header-sub %}
-<h3 class="header-sub-title wow fadeInUp" data-wow-duration="1.3s" data-wow-delay="0.5s">has been upgraded</h3>
+<h3 class="header-sub-title wow fadeInUp" data-wow-duration="1.3s" data-wow-delay="0.5s">{{ site.data.translations[page.lang].hasBeenUpgraded }}</h3>
 {% endcapture %}
 {% capture content %}
 <style>
@@ -19,7 +19,7 @@
       <div class="col-lg-8">
         <div class="section-title text-center pb-40">
           <div class="line m-auto"></div>
-          <h3 class="title"><span>Changes</span></h3>
+          <h3 class="title"><span>{{ site.data.translations[page.lang].changes }}</span></h3>
         </div>
         <div>
           {% capture readme %}{% include CHANGELOG.md %}{% endcapture %}
