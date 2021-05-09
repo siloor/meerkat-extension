@@ -1,0 +1,32 @@
+{% capture header-sub %}
+<h3 class="header-sub-title wow fadeInUp" data-wow-duration="1.3s" data-wow-delay="0.5s">has been upgraded</h3>
+{% endcapture %}
+{% capture content %}
+<style>
+  #changes h2 {
+    font-size: 30px;
+  }
+
+  #changes li {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 20px;
+  }
+</style>
+<section id="changes" class="services-area pt-120" style="padding-top: 100px;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="section-title text-center pb-40">
+          <div class="line m-auto"></div>
+          <h3 class="title"><span>Changes</span></h3>
+        </div>
+        <div>
+          {% capture readme %}{% include CHANGELOG.md %}{% endcapture %}
+          {{ readme | markdownify }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endcapture %}
