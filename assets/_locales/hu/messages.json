@@ -6,5 +6,9 @@
   "appDesc": {
     "message": "Nyílt forráskódú online piactér segéd.",
     "description": "Extension description"
+  },
+  "appLocale": {
+    "message": "hu",
+    "description": "Extension locale"
   }
 }

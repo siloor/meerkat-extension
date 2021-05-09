@@ -1,8 +1,5 @@
 const getLanguage = () => {
-  const allowedLanguages = ['en', 'hu'];
-  const languageIndex = allowedLanguages.indexOf(window.navigator.language.split('-')[0]);
-
-  return allowedLanguages[languageIndex === -1 ? 0 : languageIndex];
+  return chrome.i18n.getMessage('appLocale');
 };
 
 export const getTranslations = (translations) => {

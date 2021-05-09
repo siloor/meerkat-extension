@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title></title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Roboto', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    .frame {
+      width: 642px;
+      height: 402px;
+      border: 1px solid #f00;
+      padding: 10px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .frame.no-frame {
+      width: 640px;
+      height: 400px;
+      border: 0;
+    }
+
+    .frame ul {
+      margin: -120px 0 0 0;
+      padding: 0;
+      list-style-type: none;
+    }
+
+    .frame ul li {
+      display: block;
+      border-bottom: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    .car {
+      display: flex;
+      font-size: 16px;
+    }
+
+    .car .image-container {
+      width: 200px;
+      margin: 10px 10px 10px 0;
+    }
+
+    .car .image-container img {
+      width: 100%;
+    }
+
+    .car .content {
+      flex: 1;
+    }
+
+    .car .title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .car .price {
+      position: relative;
+      width: 110px;
+      text-align: right;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .car .price button {
+      position: absolute;
+      bottom: 10px;
+      right: 0;
+      background: #f60;
+      border-width: 1px;
+      border-style: solid;
+      border-color: #d95700 #d95700 #cc5200;
+      color: #fff;
+      font-weight: bold;
+      padding: 6px 14px;
+      border-radius: 10px;
+    }
+
+    .car .data {
+      margin-top: 14px;
+    }
+
+    .car .sub-data {
+      margin-top: 10px;
+    }
+
+    .toolbar-container {
+      height: 35px;
+      margin-left: -7px;
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <ul></ul>
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const langParam = params.get('lang');
+    const noFrameParam = !!params.get('noframe');
+    const lang = ['en', 'de', 'hu'].includes(langParam) ? langParam : 'en';
+
+    if (!chrome) {
+      var chrome = {};
+    }
+
+    chrome.i18n = {
+      getMessage() {
+        return lang;
+      }
+    };
+
+    if (noFrameParam) {
+      document.querySelector('.frame').classList.add('no-frame');
+    }
+  </script>
+  <script src="../build/htm-preact-3.0.4-standalone.umd.js"></script>
+  <script src="../build/toolbar.js"></script>
+  <script>
+    const renderPrice = (number) => {
+      const currency = {
+        en: '$',
+        de: '€',
+        hu: 'Ft',
+      };
+
+      const eurMultiplier = {
+        en: {
+          value: 1.22,
+          roundDigits: 2
+        },
+        de: {
+          value: 1,
+          roundDigits: 0
+        },
+        hu: {
+          value: 358,
+          roundDigits: 4
+        },
+      };
+
+      const roundValue = Math.pow(10, eurMultiplier[lang].roundDigits);
+      const convertedNumber = Math.round((number * eurMultiplier[lang].value) / roundValue) * roundValue;
+
+      const parts = convertedNumber.toString().split('.');
+
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+      return `${parts.join(',')} ${currency[lang]}`;
+    };
+
+    const renderCar = ({ title, data, subData, price, image, contact }) => {
+      return `
+        <li>
+          <div class="car">
+            <div class="image-container"><img src="${image}" /></div>
+            <div class="content">
+              <div class="title">${title}</div>
+              <div class="data">${data}</div>
+              <div class="sub-data">${subData}</div>
+            </div>
+            <div class="price">${price}<button>${contact}</button></div>
+          </div>
+          <div class="toolbar-container"></div>
+        </li>
+      `;
+    };
+
+    const subData = [
+      {
+        en: 'Saloon, Accident-free, Petrol, Manual gearbox, 4/5 Doors',
+        de: 'Limousine, Unfallfrei, Benzin, Schaltgetriebe, 4/5 Türen',
+        hu: 'Sedan, Sérülésmentes, Benzin, Manuális sebességváltó, 4/5 Ajtós'
+      },
+      {
+        en: 'Saloon, Petrol, Manual gearbox, 4/5 Doors',
+        de: 'Limousine, Benzin, Schaltgetriebe, 4/5 Türen',
+        hu: 'Sedan, Benzin, Manuális sebességváltó, 4/5 Ajtós'
+      }
+    ];
+    const contact = {
+      en: 'Contact',
+      de: 'Kontakt',
+      hu: 'Kapcsolat'
+    };
+    const cars = [
+      {
+        title: 'Subaru Impreza 2.0 WRX STi',
+        data: '09/2003, 95.500 km, 195 kW (265 PS)',
+        subData: subData[1][lang],
+        price: renderPrice(19891),
+        image: '2.jpg',
+        contact: contact[lang],
+        history: [
+          {
+            price: renderPrice(19500),
+            _cts: (new Date('2021-05-05T12:00:00Z')).getTime()
+          },
+          {
+            price: renderPrice(19891),
+            _cts: (new Date('2021-05-07T12:00:00Z')).getTime()
+          },
+        ]
+      },
+      {
+        title: 'Subaru Impreza 2.0 WRX STI JDM Widetrack',
+        data: '09/2004, 146.000 km, 257 kW (349 PS)',
+        subData: subData[0][lang],
+        price: renderPrice(23000),
+        image: '3.jpg',
+        contact: contact[lang],
+        history: [
+          {
+            price: renderPrice(23900),
+            description: '09/2004, 146.000 km, 257 kW (349 PS) ' + subData[0][lang],
+            _cts: (new Date('2021-04-05T12:00:00Z')).getTime()
+          },
+          {
+            price: renderPrice(23000),
+            description: '09/2004, 152.000 km, 257 kW (349 PS) ' + subData[0][lang],
+            _cts: (new Date('2021-05-07T12:00:00Z')).getTime()
+          },
+        ]
+      },
+      {
+        title: 'Subaru WRX STI 2.5',
+        data: '05/2006, 108.000 km, 206 kW (280 PS)',
+        subData: subData[1][lang],
+        price: renderPrice(21980),
+        image: '1.jpg',
+        contact: contact[lang],
+        history: [
+          {
+            price: renderPrice(21980),
+            _cts: (new Date('2021-03-17T12:00:00Z')).getTime()
+          },
+        ]
+      }
+    ];
+
+    document.querySelector('.frame ul').innerHTML = cars.map(car => renderCar(car)).join('');
+
+    const propertyNames = {
+      description: {
+        en: 'Description',
+        de: 'Beschreibung',
+        hu: 'Leírás',
+      },
+      price: {
+        en: 'Price',
+        de: 'Preis',
+        hu: 'Ár',
+      }
+    };
+    const propertiesToCheck = [
+      { name: 'description', title: propertyNames.description[lang], type: 'text' },
+      { name: 'price', title: propertyNames.price[lang], type: 'number' }
+    ];
+
+    const toolbarContainers = document.querySelectorAll('.toolbar-container');
+
+    for (let i = 0; i < toolbarContainers.length; i++) {
+      window.container.toolbar.initToolbar(
+        toolbarContainers[i].attachShadow({ mode: 'closed' }),
+        { history: cars[i].history },
+        '2021-05-07T12:00:00Z',
+        propertiesToCheck,
+        (price) => {
+          const parts = price.split(' ');
+
+          return {
+            value: parseInt(parts[0].split('.').join('')),
+            currency: parts[1]
+          };
+        },
+        () => {},
+        () => {}
+      );
+    }
+  </script>
+</body>
+</html>

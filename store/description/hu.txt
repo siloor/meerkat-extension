@@ -1,0 +1,7 @@
+- Jegyzetelj az online piacterek áruihoz
+- Jelölj meg bizonyos árukat különböző színekkel
+- Kövesd figyelemmel az áruk adatainak változását*
+
+A támogatott online piacterek listáját a bővítmény weboldalán találod.
+
+* a bővítmény csak azoknak az áruknak az adait tárolja a böngésződben, amiket megnéztél

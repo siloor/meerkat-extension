@@ -6,5 +6,9 @@
   "appDesc": {
     "message": "Open source online marketplace assistant.",
     "description": "Extension description"
+  },
+  "appLocale": {
+    "message": "en",
+    "description": "Extension locale"
   }
 }

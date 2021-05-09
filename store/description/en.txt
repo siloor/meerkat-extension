@@ -1,0 +1,7 @@
+- Take notes for marketplace items
+- Mark certain items with different colors
+- Follow the property changes of items*
+
+You can find the list of supported online marketplaces on the extension's website.
+
+* the extension stores only those properties of items in your browser, which you actually saw
