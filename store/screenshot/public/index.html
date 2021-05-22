@@ -128,36 +128,70 @@
   <script src="../build/htm-preact-3.0.4-standalone.umd.js"></script>
   <script src="../build/toolbar.js"></script>
   <script>
-    const renderPrice = (number) => {
-      const currency = {
-        en: '$',
-        de: '€',
-        hu: 'Ft',
-      };
-
-      const eurMultiplier = {
+    const getLocaleData = (lang) => {
+      return ({
         en: {
-          value: 1.22,
-          roundDigits: 2
+          propertyNames: {
+            description: 'Description',
+            price: 'Price'
+          },
+          currency: {
+            symbol: '$',
+            value: 1.22,
+            roundDigits: 2
+          },
+          messages: {
+            contact: 'Contact',
+            subData1: 'Saloon, Accident-free, Petrol, Manual gearbox, 4/5 Doors',
+            subData2: 'Saloon, Petrol, Manual gearbox, 4/5 Doors'
+          }
         },
         de: {
-          value: 1,
-          roundDigits: 0
+          propertyNames: {
+            description: 'Beschreibung',
+            price: 'Preis'
+          },
+          currency: {
+            symbol: '€',
+            value: 1,
+            roundDigits: 0
+          },
+          messages: {
+            contact: 'Kontakt',
+            subData1: 'Limousine, Unfallfrei, Benzin, Schaltgetriebe, 4/5 Türen',
+            subData2: 'Limousine, Benzin, Schaltgetriebe, 4/5 Türen'
+          }
         },
         hu: {
-          value: 358,
-          roundDigits: 4
+          propertyNames: {
+            description: 'Leírás',
+            price: 'Ár'
+          },
+          currency: {
+            symbol: 'Ft',
+            value: 358,
+            roundDigits: 4
+          },
+          messages: {
+            contact: 'Kapcsolat',
+            subData1: 'Sedan, Sérülésmentes, Benzin, Manuális sebességváltó, 4/5 Ajtós',
+            subData2: 'Sedan, Benzin, Manuális sebességváltó, 4/5 Ajtós'
+          }
         },
-      };
+      })[lang];
+    };
 
-      const roundValue = Math.pow(10, eurMultiplier[lang].roundDigits);
-      const convertedNumber = Math.round((number * eurMultiplier[lang].value) / roundValue) * roundValue;
+    const localeData = getLocaleData(lang);
+
+    const renderPrice = (number) => {
+      const roundValue = Math.pow(10, localeData.currency.roundDigits);
+      const convertedNumber = Math.round((number * localeData.currency.value) / roundValue) * roundValue;
 
       const parts = convertedNumber.toString().split('.');
 
       parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-      return `${parts.join(',')} ${currency[lang]}`;
+      return `${parts.join(',')} ${localeData.currency.symbol}`;
     };
 
     const renderCar = ({ title, data, subData, price, image, contact }) => {
@@ -177,31 +211,14 @@
       `;
     };
 
-    const subData = [
-      {
-        en: 'Saloon, Accident-free, Petrol, Manual gearbox, 4/5 Doors',
-        de: 'Limousine, Unfallfrei, Benzin, Schaltgetriebe, 4/5 Türen',
-        hu: 'Sedan, Sérülésmentes, Benzin, Manuális sebességváltó, 4/5 Ajtós'
-      },
-      {
-        en: 'Saloon, Petrol, Manual gearbox, 4/5 Doors',
-        de: 'Limousine, Benzin, Schaltgetriebe, 4/5 Türen',
-        hu: 'Sedan, Benzin, Manuális sebességváltó, 4/5 Ajtós'
-      }
-    ];
-    const contact = {
-      en: 'Contact',
-      de: 'Kontakt',
-      hu: 'Kapcsolat'
-    };
     const cars = [
       {
         title: 'Subaru Impreza 2.0 WRX STi',
         data: '09/2003, 95.500 km, 195 kW (265 PS)',
-        subData: subData[1][lang],
+        subData: localeData.messages.subData2,
         price: renderPrice(19891),
         image: '2.jpg',
-        contact: contact[lang],
+        contact: localeData.messages.contact,
         history: [
           {
             price: renderPrice(19500),
@@ -216,19 +233,19 @@
       {
         title: 'Subaru Impreza 2.0 WRX STI JDM Widetrack',
         data: '09/2004, 146.000 km, 257 kW (349 PS)',
-        subData: subData[0][lang],
+        subData: localeData.messages.subData1,
         price: renderPrice(23000),
         image: '3.jpg',
-        contact: contact[lang],
+        contact: localeData.messages.contact,
         history: [
           {
             price: renderPrice(23900),
-            description: '09/2004, 146.000 km, 257 kW (349 PS) ' + subData[0][lang],
+            description: '09/2004, 146.000 km, 257 kW (349 PS) ' + localeData.messages.subData1,
             _cts: (new Date('2021-04-05T12:00:00Z')).getTime()
           },
           {
             price: renderPrice(23000),
-            description: '09/2004, 152.000 km, 257 kW (349 PS) ' + subData[0][lang],
+            description: '09/2004, 152.000 km, 257 kW (349 PS) ' + localeData.messages.subData1,
             _cts: (new Date('2021-05-07T12:00:00Z')).getTime()
           },
         ]
@@ -236,10 +253,10 @@
       {
         title: 'Subaru WRX STI 2.5',
         data: '05/2006, 108.000 km, 206 kW (280 PS)',
-        subData: subData[1][lang],
+        subData: localeData.messages.subData2,
         price: renderPrice(21980),
         image: '1.jpg',
-        contact: contact[lang],
+        contact: localeData.messages.contact,
         history: [
           {
             price: renderPrice(21980),
@@ -251,21 +268,9 @@
 
     document.querySelector('.frame ul').innerHTML = cars.map(car => renderCar(car)).join('');
 
-    const propertyNames = {
-      description: {
-        en: 'Description',
-        de: 'Beschreibung',
-        hu: 'Leírás',
-      },
-      price: {
-        en: 'Price',
-        de: 'Preis',
-        hu: 'Ár',
-      }
-    };
     const propertiesToCheck = [
-      { name: 'description', title: propertyNames.description[lang], type: 'text' },
-      { name: 'price', title: propertyNames.price[lang], type: 'number' }
+      { name: 'description', title: localeData.propertyNames.description, type: 'text' },
+      { name: 'price', title: localeData.propertyNames.price, type: 'number' }
     ];
 
     const toolbarContainers = document.querySelectorAll('.toolbar-container');
