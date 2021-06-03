@@ -15,6 +15,7 @@ en:
   colorText: "Mark a product for yourself by choosing different colors for its toolbar."
   germany: "Germany"
   hungary: "Hungary"
+  rateWarning: "Do you like the extension? Please rate it in the chrome_store!"
 hu:
   home: "Főoldal"
   features: "Funkciók"
@@ -32,3 +33,4 @@ hu:
   colorText: "Jelölj meg egy árut magadnak különböző eszköztár színek választásával."
   germany: "Németország"
   hungary: "Magyarország"
+  rateWarning: "Tetszik a bővítmény? Kérlek értékeld a chrome_store-ban!"

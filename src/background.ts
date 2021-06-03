@@ -1,6 +1,7 @@
 import { BASE_PROPERTIES, SERVICES, RUN_CONTENT_SCRIPT } from './constants';
 import { initAnalytics, sendEvent } from './analytics';
 import { storage } from './storage';
+import { getLocale } from './translations';
 import config from './config';
 
 const getItemStorageKey = (namespace, id) => {
@@ -314,18 +315,17 @@ initAnalytics();
 
 if (config.buildEnv === 'production') {
   chrome.runtime.onInstalled.addListener(function (details) {
+    const locale = getLocale();
+    const rootUrl = `https://siloor.github.io/meerkat-extension/${locale === 'en' ? '' : `${locale}/`}`;
+
     if (details.reason === 'install') {
       sendEvent('extension', 'installed', 'installed');
 
-      chrome.tabs.create({
-        url: 'https://siloor.github.io/meerkat-extension/installed/'
-      });
+      chrome.tabs.create({ url: `${rootUrl}installed/` });
     } else if (details.reason === 'update') {
       sendEvent('extension', 'upgraded', 'upgraded');
 
-      chrome.tabs.create({
-        url: 'https://siloor.github.io/meerkat-extension/upgraded/'
-      });
+      chrome.tabs.create({ url: `${rootUrl}upgraded/` });
     }
   });
 }
