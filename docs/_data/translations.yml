@@ -16,6 +16,7 @@ en:
   germany: "Germany"
   hungary: "Hungary"
   rateWarning: "Do you like the extension? Please rate it in the chrome_store!"
+  storeUrl: "https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg"
 hu:
   home: "Főoldal"
   features: "Funkciók"
@@ -34,3 +35,4 @@ hu:
   germany: "Németország"
   hungary: "Magyarország"
   rateWarning: "Tetszik a bővítmény? Kérlek értékeld a chrome_store-ban!"
+  storeUrl: "https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg?hl=hu"

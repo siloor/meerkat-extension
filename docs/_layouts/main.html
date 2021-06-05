@@ -115,7 +115,7 @@
           <div class="footer-about wow fadeIn" data-wow-duration="1s" data-wow-delay="0.2s">
             <ul class="social">
               <li><a href="https://github.com/siloor/meerkat-extension" target="_blank"><i class="lni-github-original"></i></a></li>
-              <li><a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank"><i class="lni-google"></i></a></li>
+              <li><a href="{{ site.data.translations[page.lang].storeUrl }}" target="_blank"><i class="lni-google"></i></a></li>
             </ul>
           </div>
         </div>
@@ -171,13 +171,13 @@
 </style>
 <div class="store-rating">
   <a href="javascript:void(0);" class="close-button"><i class="lni-close"></i></a>
-  <p>{{ site.data.translations[page.lang].rateWarning | replace: "chrome_store", '<a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank">Chrome Web Store <i class="lni-chrome"></i></a> ' }}</p>
+  <p>{{ site.data.translations[page.lang].rateWarning | replace: "chrome_store", '<a href="_storeUrl_" target="_blank">Chrome Web Store <i class="lni-chrome"></i></a> '| replace: "_storeUrl_", site.data.translations[page.lang].storeUrl }}</p>
   <p>
-    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank" class="star-container"><i class="lni-star"></i></a>
-    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank" class="star-container"><i class="lni-star"></i></a>
-    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank" class="star-container"><i class="lni-star"></i></a>
-    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank" class="star-container"><i class="lni-star"></i></a>
-    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank" class="star-container"><i class="lni-star"></i></a>
+    <a href="{{ site.data.translations[page.lang].storeUrl }}" target="_blank" class="star-container"><i class="lni-star"></i></a>
+    <a href="{{ site.data.translations[page.lang].storeUrl }}" target="_blank" class="star-container"><i class="lni-star"></i></a>
+    <a href="{{ site.data.translations[page.lang].storeUrl }}" target="_blank" class="star-container"><i class="lni-star"></i></a>
+    <a href="{{ site.data.translations[page.lang].storeUrl }}" target="_blank" class="star-container"><i class="lni-star"></i></a>
+    <a href="{{ site.data.translations[page.lang].storeUrl }}" target="_blank" class="star-container"><i class="lni-star"></i></a>
   </p>
 </div>
 <a href="#" class="back-to-top"><i class="lni-chevron-up"></i></a>
