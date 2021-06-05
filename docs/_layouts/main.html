@@ -156,7 +156,7 @@
     margin: 14px 0;
   }
 
-  .store-rating .lni-star-filled {
+  .store-rating .star-container i {
     font-size: 30px;
     color: #FABE43;
   }
@@ -173,11 +173,11 @@
   <a href="javascript:void(0);" class="close-button"><i class="lni-close"></i></a>
   <p>{{ site.data.translations[page.lang].rateWarning | replace: "chrome_store", '<a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank">Chrome Web Store <i class="lni-chrome"></i></a> ' }}</p>
   <p>
-    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank"><i class="lni-star-filled"></i></a>
-    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank"><i class="lni-star-filled"></i></a>
-    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank"><i class="lni-star-filled"></i></a>
-    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank"><i class="lni-star-filled"></i></a>
-    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank"><i class="lni-star-filled"></i></a>
+    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank" class="star-container"><i class="lni-star"></i></a>
+    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank" class="star-container"><i class="lni-star"></i></a>
+    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank" class="star-container"><i class="lni-star"></i></a>
+    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank" class="star-container"><i class="lni-star"></i></a>
+    <a href="https://chrome.google.com/webstore/detail/meerkat-market-notes/bindhbmgpmgkhmicfapbiemdbbkglecg" target="_blank" class="star-container"><i class="lni-star"></i></a>
   </p>
 </div>
 <a href="#" class="back-to-top"><i class="lni-chevron-up"></i></a>
@@ -199,6 +199,14 @@
 <script>
   $('.store-rating .close-button').on('click', function(e) {
     $(this).closest('.store-rating').remove()
+  });
+
+  $('.store-rating .star-container').on('mouseenter mouseleave', function(e) {
+    $('.store-rating .star-container i').toggleClass('lni-star-filled', false).toggleClass('lni-star', true);
+
+    if (e.type === 'mouseenter') {
+      $('.store-rating .star-container:lt(' + ($(this).index() + 1) + ') i').toggleClass('lni-star-filled', true).toggleClass('lni-star', false);
+    }
   });
 </script>
 </body>
