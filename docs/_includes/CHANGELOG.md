@@ -1,6 +1,10 @@
+## 0.0.13
+
+* Added uninstalled page
+
 ## 0.0.12
 
-* Add package internationalization
+* Added package internationalization
 
 ## 0.0.11
 
