@@ -319,6 +319,8 @@ if (config.buildEnv === 'production') {
     const rootUrl = `https://siloor.github.io/meerkat-extension/${locale === 'en' ? '' : `${locale}/`}`;
 
     if (details.reason === 'install') {
+      chrome.runtime.setUninstallURL(`${rootUrl}uninstalled/`);
+
       sendEvent('extension', 'installed', 'installed');
 
       chrome.tabs.create({ url: `${rootUrl}installed/` });
