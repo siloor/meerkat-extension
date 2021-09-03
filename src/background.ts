@@ -89,25 +89,41 @@ const migrate = async () => {
   }
 };
 
+let inactiveSites = [];
+
+const getInactiveSites = async () => {
+  try {
+    const response = await fetch('https://siloor.github.io/meerkat-extension/assets/inactive_sites.json');
+    const data = await response.json();
+
+    inactiveSites = data.sites;
+  } catch(e) { }console.log(inactiveSites);
+};
+
 const getSiteScript = (url) => {
   const sites = [
     {
+      name: 'hasznaltauto.hu',
       matches: ['.*://(.*\\.)?hasznaltauto\\.hu/.*'],
       js: ['sites/hasznaltauto.hu.js']
     },
     {
+      name: 'ingatlan.com',
       matches: ['.*://(.*\\.)?ingatlan\\.com/.*'],
       js: ['sites/ingatlan.com.js']
     },
     {
+      name: 'ingatlan.jofogas.hu',
       matches: ['.*://ingatlan\\.jofogas\\.hu/.*'],
       js: ['sites/ingatlan.jofogas.hu.js']
     },
     {
+      name: 'mobile.de',
       matches: ['.*://suchen\\.mobile\\.de/.*'],
       js: ['sites/mobile.de.js']
     },
     {
+      name: 'immobilienscout24.de',
       matches: ['.*://www\\.immobilienscout24\\.de/.*'],
       js: ['sites/immobilienscout24.de.js']
     },
@@ -119,7 +135,7 @@ const getSiteScript = (url) => {
     });
   });
 
-  return site ? site.js[0] : null;
+  return site && inactiveSites.indexOf(site.name) === -1 ? site.js[0] : null;
 };
 
 const getList = async (sendResponse, namespace, propertiesToCheck, version, items) => {
@@ -312,6 +328,8 @@ chrome.runtime.onMessage.addListener(
 migrate();
 
 initAnalytics();
+
+getInactiveSites();
 
 if (config.buildEnv === 'production') {
   chrome.runtime.onInstalled.addListener(function (details) {

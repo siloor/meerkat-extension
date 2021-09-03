@@ -1,3 +1,7 @@
+## 0.0.14
+
+* Added inactive site handling
+
 ## 0.0.13
 
 * Added uninstalled page
