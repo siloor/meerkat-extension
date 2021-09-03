@@ -97,7 +97,7 @@ const getInactiveSites = async () => {
     const data = await response.json();
 
     inactiveSites = data.sites;
-  } catch(e) { }console.log(inactiveSites);
+  } catch(e) { }
 };
 
 const getSiteScript = (url) => {
